@@ -81,7 +81,8 @@ vector: `sovpal("gost14202")[c("water", "fire")]` or `sovpal("steppe")[2:3]`.
 | `hazard` | diverging | 3 | archival | Safe → danger (green/grey/red) | GOST 14202-69 |
 | `gost14202_lines` | qualitative | 6 | viz | White-safe subset of `gost14202` | subset of GOST 14202-69 |
 | `constructivist_core` | qualitative | 4 | viz | `constructivist` without the cream ground | subset of `constructivist` |
-| `hazard_cvd` | diverging | 3 | viz | Colorblind-safe safe → danger (blue/grey/red) | canonical sovpal hexes |
+| `hazard_cvd` | diverging | 3 | viz | Colorblind-safe safe → danger (blue/cream/red) | canonical sovpal hexes |
+| `hazard_warm` | diverging | 3 | viz | Safe → danger (green/cream/red); prettiest, **not** CVD-safe | canonical sovpal hexes |
 
 \* `constructivist` is evocative, not standards-derived; `palette_info()` reports
 `evocative = TRUE`.
@@ -110,7 +111,8 @@ steppe:              #C9A96E  #51653F  #3D2B1F
 hazard:              #2E7D32  #78909C  #C62828
 gost14202_lines:     #2E7D32  #C62828  #5B8DB8  #E64A19  #8E6EAF  #78909C
 constructivist_core: #CD2500  #1A1A1A  #F9A825  #1565C0
-hazard_cvd:          #1565C0  #78909C  #C62828
+hazard_cvd:          #1565C0  #E8DFC8  #C62828
+hazard_warm:         #2E7D32  #E8DFC8  #C62828
 ```
 
 ---

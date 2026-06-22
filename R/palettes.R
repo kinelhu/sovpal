@@ -114,14 +114,29 @@
 
   # --- Diverging (viz-optimized) ---------------------------------------------
 
-  # Colorblind-safe alternative to `hazard`. Blue-grey-red is distinguishable
-  # under deuteranopia/protanopia where green-red is not. Every stop is a
-  # canonical sovpal hex: blue from gost_signal `mandatory` / constructivist
-  # `blue`, grey from gost14202 `other`, red from gost14202 `fire`.
+  # Colorblind-safe alternative to `hazard`. Blue-cream-red is distinguishable
+  # under deuteranopia/protanopia where green-red is not, and the light cream
+  # midpoint reads as a proper diverging zero-point. Every stop is a canonical
+  # sovpal hex: blue from gost_signal `mandatory` / constructivist `blue`,
+  # cream from constructivist `cream`, red from gost14202 `fire`.
   hazard_cvd = structure(
     c(
       "#1565C0",  # blue  (safe / low)
-      "#78909C",  # grey  (neutral)
+      "#E8DFC8",  # cream (neutral)
+      "#C62828"   # red   (danger / high)
+    ),
+    type = "diverging"
+  ),
+
+  # Warm diverging variant with a light cream midpoint. Aesthetically the
+  # nicest of the diverging set, but green-red ends are NOT colorblind-safe;
+  # use hazard_cvd when that matters. Every stop is a canonical sovpal hex:
+  # green from gost14202 `water`, cream from constructivist, red from
+  # gost14202 `fire`.
+  hazard_warm = structure(
+    c(
+      "#2E7D32",  # green (safe / low)
+      "#E8DFC8",  # cream (neutral)
       "#C62828"   # red   (danger / high)
     ),
     type = "diverging"
@@ -229,15 +244,37 @@
   hazard_cvd = list(
     tier            = "viz",
     evocative       = FALSE,
-    source          = "Canonical sovpal hexes recombined (gost_signal blue, gost14202 grey + red).",
+    source          = "Canonical sovpal hexes recombined (gost_signal/constructivist blue, constructivist cream, gost14202 red).",
     recommended_use = paste0(
       "Colorblind-safe diverging safe-to-danger scale: blue (safe/low) to ",
-      "grey (neutral) to red (danger/high). Use in place of `hazard` when ",
+      "cream (neutral) to red (danger/high). Use in place of `hazard` when ",
       "red-green color vision deficiency is a concern."
     ),
     cvd_note        = "Distinguishable under deuteranopia and protanopia.",
     derived_from    = "hazard",
-    white_note      = "All stops are adequate on white backgrounds."
+    white_note      = paste0(
+      "The light cream midpoint is near-white; it reads as a zero-point in a ",
+      "gradient but is not meant as a standalone discrete swatch."
+    )
+  ),
+  hazard_warm = list(
+    tier            = "viz",
+    evocative       = FALSE,
+    source          = "Canonical sovpal hexes recombined (gost14202 green + red, constructivist cream).",
+    recommended_use = paste0(
+      "Diverging safe-to-danger scale with a light cream midpoint: green ",
+      "(safe/low) to cream (neutral) to red (danger/high). The most legible ",
+      "and attractive diverging option when colorblind safety is not required."
+    ),
+    cvd_note        = paste0(
+      "Green-red ends are hard to read under red-green color vision deficiency ",
+      "(~8% of men). Use `hazard_cvd` for those audiences."
+    ),
+    derived_from    = "hazard",
+    white_note      = paste0(
+      "The light cream midpoint is near-white; it reads as a zero-point in a ",
+      "gradient but is not meant as a standalone discrete swatch."
+    )
   )
 )
 

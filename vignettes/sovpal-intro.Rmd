@@ -102,6 +102,7 @@ These reuse only canonical hex values from the archival palettes above.
 show_palette("gost14202_lines")
 show_palette("constructivist_core")
 show_palette("hazard_cvd")
+show_palette("hazard_warm")
 ```
 
 ## Basic Usage
@@ -244,9 +245,11 @@ ggplot(df_hm, aes(x, y, fill = z)) +
   coord_equal()
 ```
 
-`hazard` is green-to-red, which is hard to read under red-green color vision
-deficiency. For those audiences, `hazard_cvd` carries the same safe-to-danger
-semantics with colorblind-safe blue-to-red hues:
+The diverging palettes use a light cream midpoint that reads as a zero-point and
+makes both arms pop. `hazard` itself keeps its archival GOST green/grey/red. For
+plots, `hazard_warm` (green/cream/red) is the most legible, and `hazard_cvd`
+(blue/cream/red) carries the same safe-to-danger semantics with colorblind-safe
+hues for red-green-deficient audiences:
 
 ```{r ggplot2-heatmap-cvd, eval = has_ggplot2, fig.height = 3.5}
 ggplot(df_hm, aes(x, y, fill = z)) +

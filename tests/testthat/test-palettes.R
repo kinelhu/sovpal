@@ -51,12 +51,23 @@ test_that("viz palettes exist and reuse only canonical hex values", {
   expect_true(all(sovpal("constructivist_core") %in% sovpal("constructivist")))
   expect_false("#E8DFC8" %in% sovpal("constructivist_core"))
 
-  # hazard_cvd introduces no new hex values vs the rest of the package
-  all_other <- unlist(lapply(
-    setdiff(names(sovpal:::.sovpal_palettes), "hazard_cvd"),
-    function(nm) as.character(sovpal:::.sovpal_palettes[[nm]])
-  ))
-  expect_true(all(sovpal("hazard_cvd") %in% all_other))
+  # diverging viz palettes introduce no new hex values vs archival palettes
+  archival <- sovpal_palettes()$palette[sovpal_palettes()$tier == "archival"]
+  archival_hex <- unlist(lapply(archival, function(nm) as.character(sovpal(nm))))
+  expect_true(all(sovpal("hazard_cvd")  %in% archival_hex))
+  expect_true(all(sovpal("hazard_warm") %in% archival_hex))
+})
+
+test_that("diverging viz palettes use the light cream midpoint", {
+  expect_equal(unname(sovpal("hazard_cvd")[2]),  "#E8DFC8")
+  expect_equal(unname(sovpal("hazard_warm")[2]), "#E8DFC8")
+  # archival hazard is untouched (keeps the GOST blue-grey midpoint)
+  expect_equal(unname(sovpal("hazard")[2]), "#78909C")
+})
+
+test_that("hazard_warm carries a red-green CVD caveat", {
+  expect_true(grepl("color vision", palette_info("hazard_warm")$cvd_note))
+  expect_true(grepl("hazard_cvd", palette_info("hazard_warm")$cvd_note))
 })
 
 test_that("removed palettes throw informative errors", {

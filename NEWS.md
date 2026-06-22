@@ -20,7 +20,12 @@ is still lifecycle-experimental and pre-CRAN).
 * **Visualization-optimized palettes** that reuse only canonical hex values:
   * `gost14202_lines` — white-background-safe 6-color subset of `gost14202`.
   * `constructivist_core` — `constructivist` without the low-contrast cream.
-  * `hazard_cvd` — colorblind-safe (blue/grey/red) alternative to `hazard`.
+  * `hazard_cvd` — colorblind-safe (blue/cream/red) alternative to `hazard`.
+  * `hazard_warm` — green/cream/red diverging scale; the most legible
+    diverging option when colorblind safety is not required.
+* The diverging viz palettes now use a light cream midpoint (`#E8DFC8`) instead
+  of the muddy mid blue-grey, giving a proper light "zero" point. Archival
+  `hazard` keeps its GOST green/grey/red.
 * `sovpal_palettes()` enumerates every palette (name, type, tier, n_colors).
 * `palette_info()` is now generic for all palettes (no more `hazard`
   special-case) and reports `tier`, `source`, `recommended_use`, `cvd_note`,
