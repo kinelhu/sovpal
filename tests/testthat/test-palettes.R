@@ -135,6 +135,24 @@ test_that("diverging viz composites use the light cream midpoint", {
 })
 
 
+# --- sequential palettes -----------------------------------------------------
+
+test_that("rust, steel, field, cobalt exist as 5-stop sequential ramps", {
+  for (nm in c("rust", "steel", "field", "cobalt")) {
+    expect_equal(palette_info(nm)$type, "sequential", info = nm)
+    expect_length(sovpal(nm), 5)
+  }
+})
+
+test_that("constructed sequential palettes have monotonic lightness", {
+  seqs <- sovpal_palettes()$palette[sovpal_palettes()$type == "sequential"]
+  for (nm in setdiff(seqs, "steppe")) {  # steppe is intentionally non-monotonic
+    L <- vapply(as.character(sovpal(nm)), sovpal:::.sovpal_luminance, numeric(1))
+    expect_true(all(diff(L) < 0), info = nm)
+  }
+})
+
+
 # --- data integrity ----------------------------------------------------------
 
 test_that("all hex codes match valid hex format", {

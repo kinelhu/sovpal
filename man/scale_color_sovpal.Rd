@@ -25,9 +25,9 @@ A ggplot2 scale object.
 \description{
 A ggplot2 scale for the \code{colour} aesthetic using sovpal palettes.
 
-The scale uses the named palette exactly as defined -- no colors are dropped
-or interpolated for a discrete scale. See \code{\link[=sovpal_palettes]{sovpal_palettes()}} for the full
-list, and \code{\link[=palette_info]{palette_info()}} for per-color white-background contrast.
+The scale uses the named palette as defined. No colors are dropped or
+interpolated for a discrete scale. See \code{\link[=sovpal_palettes]{sovpal_palettes()}} for the full list
+and \code{\link[=palette_info]{palette_info()}} for per-color white-background contrast.
 
 Requires the \pkg{ggplot2} package.
 }

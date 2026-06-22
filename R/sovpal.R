@@ -5,12 +5,12 @@
 #' thematic `domain` and a functional `type` (qualitative / sequential /
 #' diverging):
 #'
-#' * **industrial** -- GOST civil/industrial standards (`gost14202`, `gost_signal`).
-#' * **military**   -- Soviet military paint and camouflage (`soviet_military`, `steppe`).
-#' * **artistic**   -- avant-garde palettes color-sampled from specific artworks,
-#'   named for the artist (`lissitzky`, `popova`, `stepanova`, `malevich`).
-#' * **composite**  -- functional diverging scales assembled from the others
-#'   (`hazard`, `hazard_warm`, `hazard_cvd`).
+#' * `industrial`: GOST civil and industrial standards (`gost14202`, `gost_signal`).
+#' * `military`: Soviet military paint and camouflage (`soviet_military`, `steppe`).
+#' * `artistic`: palettes color-sampled from specific artworks, named for the
+#'   artist (`lissitzky`, `popova`, `stepanova`, `malevich`).
+#' * `composite`: diverging scales assembled from the others (`hazard`,
+#'   `hazard_warm`, `hazard_cvd`).
 #'
 #' To subset or slice a palette, index the returned named vector with base R,
 #' e.g. `sovpal("gost14202")[c("water", "fire")]` or `sovpal("steppe")[2:3]`.

@@ -9,12 +9,12 @@ Color palettes drawn from the Soviet industrial world. Each palette has a
 thematic \code{domain} and a functional \code{type} (qualitative / sequential /
 diverging):
 \itemize{
-\item \strong{industrial} -- GOST civil/industrial standards (\code{gost14202}, \code{gost_signal}).
-\item \strong{military}   -- Soviet military paint and camouflage (\code{soviet_military}, \code{steppe}).
-\item \strong{artistic}   -- avant-garde palettes color-sampled from specific artworks,
-named for the artist (\code{lissitzky}, \code{popova}, \code{stepanova}, \code{malevich}).
-\item \strong{composite}  -- functional diverging scales assembled from the others
-(\code{hazard}, \code{hazard_warm}, \code{hazard_cvd}).
+\item \code{industrial}: GOST civil and industrial standards (\code{gost14202}, \code{gost_signal}).
+\item \code{military}: Soviet military paint and camouflage (\code{soviet_military}, \code{steppe}).
+\item \code{artistic}: palettes color-sampled from specific artworks, named for the
+artist (\code{lissitzky}, \code{popova}, \code{stepanova}, \code{malevich}).
+\item \code{composite}: diverging scales assembled from the others (\code{hazard},
+\code{hazard_warm}, \code{hazard_cvd}).
 }
 
 To subset or slice a palette, index the returned named vector with base R,

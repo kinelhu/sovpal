@@ -24,9 +24,8 @@ has_jpeg    <- requireNamespace("jpeg", quietly = TRUE)
 ```
 
 ```{r theme, include = FALSE}
-# An opinionated visual language for the showcase. theme_linedraw evokes the
-# ruled, boxed look of Soviet technical drawing (the GOST/ESKD drafting world
-# these colors come from); we lighten its grid so the COLOR carries the plot.
+# theme_linedraw resembles a ruled technical drawing. The grid is lightened so
+# the fill and colour aesthetics dominate the plot.
 if (has_ggplot2) {
   library(ggplot2)
   theme_sovpal <- function(base_size = 11) {
@@ -42,7 +41,7 @@ if (has_ggplot2) {
   theme_set(theme_sovpal())
 }
 
-# Draw an artwork thumbnail beside its sampled palette (MetBrewer style).
+# Draw an artwork thumbnail beside its sampled palette.
 lum <- function(hex) {
   rgb <- grDevices::col2rgb(hex) / 255
   colSums(c(0.2126, 0.7152, 0.0722) * rgb)
@@ -62,14 +61,13 @@ art_plot <- function(img_path, pal_name, caption) {
 }
 ```
 
-`sovpal` provides color palettes drawn from the Soviet world — GOST
-pipeline-identification standards, military paint specifications, and the
-palettes of avant-garde artworks. Colors are historically sourced, and many of
-them *mean something*: in GOST 14202-69, green is water, red is fire
-suppression, yellow is gas.
+`sovpal` provides colour palettes from three Soviet sources: GOST industrial
+standards, military paint references, and avant-garde artworks. Several palettes
+are semantic. In GOST 14202-69, green denotes water, red fire suppression, and
+yellow flammable gas.
 
 ```{r hero, eval = has_ggplot2, fig.height = 4.6, echo = FALSE}
-# Hero: terrain elevation in the `steppe` camouflage ramp, with contour ruling.
+# Terrain elevation rendered with the steppe sequential palette.
 v <- expand.grid(row = seq_len(nrow(volcano)), col = seq_len(ncol(volcano)))
 v$elev <- as.vector(volcano)
 
@@ -86,8 +84,8 @@ ggplot(v, aes(col, row, fill = elev)) +
 
 ## Palettes by domain
 
-Each palette has a thematic **domain** and a functional **type**
-(qualitative / sequential / diverging):
+Each palette has a thematic `domain` and a functional `type` (qualitative,
+sequential, or diverging).
 
 ```{r enumerate}
 sovpal_palettes()
@@ -97,12 +95,12 @@ sovpal_palettes()
 show_all_palettes()
 ```
 
-## Industrial — colors that mean something
+## Industrial
 
-The distinctive thing about the GOST palettes is *semantic* color. Because
-`sovpal()` returns a **named** vector, you can map categories to their correct
-colors with `scale_*_manual()` — water is always green, gas always yellow,
-regardless of plotting order.
+The GOST palettes are semantic. Because `sovpal()` returns a named vector,
+categories can be mapped to fixed colours with `scale_*_manual()`. The
+assignment is by name, so water is green and gas is yellow regardless of
+plotting order.
 
 ```{r pipeline, eval = has_ggplot2, fig.height = 4}
 set.seed(1969)
@@ -119,14 +117,14 @@ ggplot(flow, aes(year, throughput, fill = fluid)) +
   geom_area(colour = "grey15", linewidth = 0.15) +
   scale_fill_manual(values = sovpal("gost14202")) +
   labs(title = "Pipeline throughput by fluid category",
-       subtitle = "GOST 14202-69 colors mapped to their meanings",
+       subtitle = "GOST 14202-69 fluid colours",
        x = NULL, y = "Throughput", fill = "Fluid")
 ```
 
-## Military — paint and camouflage
+## Military
 
-`soviet_military` is an earth-toned set of period vehicle and aircraft colors;
-`steppe` (the hero image above) is the camouflage terrain ramp.
+`soviet_military` is a set of period vehicle and aircraft colours. `steppe`
+(shown above) is a camouflage terrain ramp.
 
 ```{r military, eval = has_ggplot2, fig.height = 3.8}
 set.seed(42)
@@ -142,41 +140,65 @@ ggplot(dens, aes(value, fill = class)) +
   labs(title = "soviet_military", x = NULL, y = "Density", fill = NULL)
 ```
 
-## Artistic — palettes from the avant-garde
+## Artistic
 
-Each artistic palette is **color-sampled from a specific artwork** and named for
-the artist (cf. \pkg{MetBrewer}). The hex values are approximate, sampled from
-reproductions — see `data-raw/sample_artwork.R`.
+Each artistic palette is colour-sampled from a specific artwork and named for
+the artist, following the convention of the MetBrewer package. The hex values
+are approximate, sampled from reproductions. See `data-raw/sample_artwork.R`.
 
 ```{r art-lissitzky, eval = has_jpeg, fig.height = 2.6, echo = FALSE}
 art_plot("artwork/lissitzky.jpg", "lissitzky",
-         "El Lissitzky — Beat the Whites with the Red Wedge (1919)")
+         "El Lissitzky, Beat the Whites with the Red Wedge (1919)")
 ```
 
 ```{r art-popova, eval = has_jpeg, fig.height = 2.6, echo = FALSE}
 art_plot("artwork/popova.jpg", "popova",
-         "Liubov Popova — Architectonic Painting (1917)")
+         "Liubov Popova, Architectonic Painting (1917)")
 ```
 
 ```{r art-malevich, eval = has_jpeg, fig.height = 2.6, echo = FALSE}
 art_plot("artwork/malevich.jpg", "malevich",
-         "Kazimir Malevich — Suprematist Composition (1916)")
+         "Kazimir Malevich, Suprematist Composition (1916)")
 ```
 
-`stepanova` is sampled from Varvara Stepanova's *Billiard Players* (1920) — a
-muted cubo-futurist work of charcoal, slate, brick, gold, and khaki. Her work is
-still under copyright in the EU (she died in 1958), so the image is not bundled;
-[view it at the Museo Thyssen-Bornemisza](https://www.museothyssen.org/en/collection/artists/stepanova-varvara/billiard-players).
+`stepanova` is sampled from Varvara Stepanova's *Billiard Players* (1920), a
+cubo-futurist work in charcoal, slate, brick, gold, and khaki. The work is under
+copyright in the EU (Stepanova died in 1958), so the image is not bundled; the
+palette is shown below.
+[View the work at the Museo Thyssen-Bornemisza](https://www.museothyssen.org/en/collection/artists/stepanova-varvara/billiard-players).
 
 ```{r art-stepanova, fig.height = 1.7}
 show_palette("stepanova", notes = FALSE)
 ```
 
-## Composite — diverging scales
+## Sequential ramps
 
-For a diverging scale the midpoint should be the *lightest* point. The composite
-diverging palettes use a light cream center; `hazard_warm` (green → cream → red)
-is the most legible:
+`rust`, `steel`, `cobalt`, and `field` are constructed for monotonic lightness
+and are suitable for continuous scales. `steppe` is multi-hue and its lightness
+is not monotonic.
+
+```{r sequential, eval = has_ggplot2, fig.height = 2.8}
+seqs <- c("rust", "steel", "cobalt", "field")
+ramp <- do.call(rbind, lapply(seqs, function(p)
+  data.frame(pal = p, x = 1:100, fill = sovpal(p, n = 100, type = "continuous"))))
+ramp$pal <- factor(ramp$pal, levels = seqs)
+
+ggplot(ramp, aes(x, 1, fill = fill)) +
+  geom_raster() +
+  scale_fill_identity() +
+  facet_wrap(~pal, ncol = 1, strip.position = "left") +
+  labs(x = NULL, y = NULL) +
+  theme(axis.text = element_blank(), axis.ticks = element_blank(),
+        strip.text.y.left = element_text(angle = 0, face = "bold"),
+        panel.grid = element_blank())
+```
+
+## Composite
+
+The diverging palettes place the lightest colour at the midpoint. `hazard_warm`
+(green, cream, red) and `hazard_cvd` (blue, cream, red) use a light cream
+midpoint; `hazard_cvd` is intended for red-green colour vision deficiency.
+`hazard` (green, grey, red) retains the GOST source colours.
 
 ```{r diverging-warm, eval = has_ggplot2, fig.height = 4.4}
 v$centered <- v$elev - mean(v$elev)
@@ -184,16 +206,12 @@ lim <- max(abs(v$centered))
 ggplot(v, aes(col, row, fill = centered)) +
   geom_raster() +
   scale_fill_sovpal("hazard_warm", discrete = FALSE,
-                    limits = c(-lim, lim), name = "Δ elev") +
+                    limits = c(-lim, lim), name = "Delta elev") +
   coord_equal(expand = FALSE) +
-  labs(title = "hazard_warm", subtitle = "green / cream / red") +
+  labs(title = "hazard_warm", subtitle = "green, cream, red") +
   theme(axis.title = element_blank(), axis.text = element_blank(),
         axis.ticks = element_blank())
 ```
-
-When red–green colorblindness matters, `hazard_cvd` (blue → cream → red) carries
-the same safe-to-danger meaning with distinguishable hues. The archival `hazard`
-(green / grey / red) keeps its faithful GOST values as the historical record.
 
 ## Usage
 
@@ -201,17 +219,18 @@ the same safe-to-danger meaning with distinguishable hues. The archival `hazard`
 # Retrieve a palette (named vector)
 sovpal("malevich")
 
-# n colors, or interpolate a continuous ramp
+# n colours, or interpolate a continuous ramp
 sovpal("gost14202", n = 4)
 length(sovpal("steppe", n = 100, type = "continuous"))
 
-# Slice or subset with base-R indexing
+# Subset with base-R indexing
 sovpal("gost14202")[c("water", "fire", "air")]
 ```
 
-`palette_info()` reports domain, provenance, intended use, colorblindness
-caveats, and **computed** white-background contrast (WCAG ratio; 3:1 is the
-non-text threshold). Lissitzky's off-white ground is flagged automatically:
+`palette_info()` reports the domain, provenance, recommended use, colour vision
+notes, and computed white-background contrast (WCAG ratio; 3:1 is the threshold
+for graphical objects). The off-white ground in `lissitzky` falls below the
+threshold and is listed in `low_contrast_on_white`.
 
 ```{r info}
 info <- palette_info("lissitzky")
@@ -222,19 +241,19 @@ info$low_contrast_on_white
 
 ## Historical notes
 
-**GOST 14202-69 — pipeline identification.** Adopted in 1969, it standardized
-the color-coding of industrial pipelines across all Soviet enterprises: eight
-base colors for fluid categories, referenced by paint card number.
+GOST 14202-69 (pipeline identification), adopted in 1969, standardised the
+colour-coding of industrial pipelines across Soviet enterprises: eight base
+colours for fluid categories, referenced by paint card number.
 
-**GOST 12.4.026 — safety signage.** Four signal colors encoding urgency: red
-(danger), yellow (caution), green (safe), blue (mandatory action).
+GOST 12.4.026 (safety signage) defines four signal colours: red (danger),
+yellow (caution), green (safe), and blue (mandatory action).
 
-**4BO Protective Green (`#51653F`).** The canonical Soviet vehicle exterior
-color, used from the 1930s through the Cold War; based on Vallejo 70.609. It
-appears in `soviet_military` and as `steppe`'s middle stop.
+4BO Protective Green (`#51653F`) was the standard Soviet vehicle exterior colour
+from the 1930s through the Cold War. The value is based on Vallejo 70.609. It
+appears in `soviet_military` and as the middle stop of `steppe`.
 
-**The avant-garde palettes.** `lissitzky`, `popova`, `stepanova`, and `malevich`
-are color-sampled from reproductions of specific Constructivist and Suprematist
-works (1916–1920). They are evocative of those works rather than authoritative
-color records.
+The artistic palettes (`lissitzky`, `popova`, `stepanova`, `malevich`) are
+colour-sampled from reproductions of Constructivist and Suprematist works made
+between 1916 and 1920. The values are approximate and are not authoritative
+colour records.
 ```

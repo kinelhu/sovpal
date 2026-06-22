@@ -55,17 +55,21 @@ ggplot(mtcars, aes(factor(cyl), fill = factor(cyl))) +
 
 | Domain | Palettes |
 |---|---|
-| **industrial** | `gost14202` (8, qual), `gost_signal` (4, qual) |
-| **military** | `soviet_military` (6, qual), `steppe` (3, sequential) |
-| **artistic** | `lissitzky` (4), `popova` (5), `stepanova` (5), `malevich` (5) — all qual |
+| **industrial** | `gost14202` (8, qual), `gost_signal` (4, qual), `rust` (5, seq), `steel` (5, seq), `cobalt` (5, seq) |
+| **military** | `soviet_military` (6, qual), `steppe` (3, seq), `field` (5, seq) |
+| **artistic** | `lissitzky` (4), `popova` (5), `stepanova` (5), `malevich` (5), all qualitative |
 | **composite** | `hazard`, `hazard_warm`, `hazard_cvd` (3 each, diverging) |
 
-The **artistic** palettes are color-sampled from specific avant-garde works and
-named for the artist (cf. [MetBrewer](https://github.com/BlakeRMills/MetBrewer)).
-The **composite** palettes are functional diverging scales assembled from the
-others — `hazard` is the faithful GOST green/grey/red; `hazard_warm`
-(green/cream/red) is the most legible; `hazard_cvd` (blue/cream/red) is
-colorblind-safe.
+The sequential ramps `rust`, `steel`, `cobalt`, and `field` are constructed for
+monotonic lightness (verified against the package's WCAG luminance helper).
+`steppe` is multi-hue and its lightness is not monotonic.
+
+The artistic palettes are color-sampled from specific avant-garde works and
+named for the artist, following the convention of
+[MetBrewer](https://github.com/BlakeRMills/MetBrewer). The composite palettes
+are diverging scales assembled from the others: `hazard` uses the GOST
+green/grey/red, `hazard_warm` uses green/cream/red, and `hazard_cvd` uses
+blue/cream/red for red-green color vision deficiency.
 
 To subset or slice, index the returned named vector:
 `sovpal("gost14202")[c("water", "fire")]` or `sovpal("steppe")[2:3]`.
@@ -74,11 +78,11 @@ To subset or slice, index the returned named vector:
 
 ## Accessibility
 
-* **White-background contrast is computed, not hand-curated.** `palette_info()`
-  reports each color's WCAG contrast ratio against white and flags any below the
-  3:1 non-text threshold (`low_contrast_on_white`).
-* **`hazard` is green↔red** and hard to read under red-green color vision
-  deficiency. Use `hazard_cvd` (blue↔red) for those audiences.
+* `palette_info()` computes each color's WCAG contrast ratio against white from
+  its hex value and lists any below the 3:1 threshold for graphical objects in
+  `low_contrast_on_white`.
+* `hazard` is green-to-red and is hard to read under red-green color vision
+  deficiency. `hazard_cvd` (blue, cream, red) is provided for those cases.
 
 ---
 
@@ -89,6 +93,10 @@ gost14202:        #2E7D32  #C62828  #5B8DB8  #F9A825  #E64A19  #8E6EAF  #5D4037 
 gost_signal:      #D32F2F  #FDD835  #388E3C  #1565C0
 soviet_military:  #51653F  #5B8F8C  #C45830  #CD2500  #3D2B1F  #C9A96E
 steppe:           #C9A96E  #51653F  #3D2B1F
+rust:             #F4ECDD  #E0A66B  #C45830  #8A3415  #4A1E0E
+steel:            #ECEFF1  #AEB8BE  #78909C  #45565F  #1F2A30
+cobalt:           #E6EEF4  #9FC0D8  #5B8DB8  #2E5A86  #15293F
+field:            #E4DCBE  #9AA36B  #51653F  #33402A  #161D12
 lissitzky:        #EEEDDB  #D84F24  #131312  #8E9396
 popova:           #BF3E08  #2F4672  #455238  #CC8F58  #1E2227
 stepanova:        #1C1B1C  #4E5753  #772821  #B9882A  #C5C7B8
@@ -107,8 +115,8 @@ sampling script is `data-raw/sample_artwork.R`.
 ## Interoperability
 
 sovpal works with base R (`sovpal()` returns a plain named vector) and ggplot2
-(`scale_color_sovpal()` / `scale_fill_sovpal()`). It is also structured for
-ingestion into [paletteer](https://github.com/EmilHvitfeldt/paletteer) — see
+(`scale_color_sovpal()`, `scale_fill_sovpal()`). It is structured for ingestion
+into [paletteer](https://github.com/EmilHvitfeldt/paletteer); see
 [`PALETTEER.md`](PALETTEER.md). `sovpal_palettes()` enumerates every palette.
 
 ---

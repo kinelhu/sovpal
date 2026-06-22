@@ -39,6 +39,26 @@
     type = "qualitative"
   ),
 
+  # Constructed sequential ramps with monotonic lightness, anchored on canonical
+  # industrial colors. rust = oxidation/decay (anchor primer #C45830);
+  # steel = pipe grey (anchor gost14202 `other` #78909C).
+  rust = structure(
+    c("#F4ECDD", "#E0A66B", "#C45830", "#8A3415", "#4A1E0E"),
+    type = "sequential"
+  ),
+
+  steel = structure(
+    c("#ECEFF1", "#AEB8BE", "#78909C", "#45565F", "#1F2A30"),
+    type = "sequential"
+  ),
+
+  # Constructed sequential ramp (monotonic lightness) anchored on gost14202
+  # `air` compressed-air blue #5B8DB8.
+  cobalt = structure(
+    c("#E6EEF4", "#9FC0D8", "#5B8DB8", "#2E5A86", "#15293F"),
+    type = "sequential"
+  ),
+
   # === military ==============================================================
 
   soviet_military = structure(
@@ -60,6 +80,14 @@
       "#51653F",  # 4BO Protective Green
       "#3D2B1F"   # Dark Brown 6K camouflage
     ),
+    type = "sequential"
+  ),
+
+  # Constructed sequential ramp with monotonic lightness, anchored on 4BO
+  # Protective Green (#51653F). Unlike steppe, this is suitable for encoding
+  # magnitude on a continuous scale.
+  field = structure(
+    c("#E4DCBE", "#9AA36B", "#51653F", "#33402A", "#161D12"),
     type = "sequential"
   ),
 
@@ -127,10 +155,9 @@
     type = "diverging"
   ),
 
-  # Warm diverging with a light cream midpoint (the nicest-looking diverging
-  # option). green and red from gost14202; the cream is a defined light neutral
-  # chosen as the diverging zero-point. Green-red ends are NOT colorblind-safe;
-  # use hazard_cvd when that matters.
+  # Warm diverging palette with a light cream midpoint. Green and red from
+  # gost14202; the cream is a defined light neutral used as the diverging
+  # zero-point. Green-red ends are not colorblind-safe; see hazard_cvd.
   hazard_warm = structure(
     c(
       "#2E7D32",  # green (safe / low)
@@ -178,6 +205,27 @@
     cvd_note        = NULL,
     white_note      = "The light `caution` yellow reads best as a fill rather than a thin line."
   ),
+  rust = list(
+    domain          = "industrial",
+    source          = "Constructed sequential ramp (monotonic lightness) evoking iron oxidation; anchored on primer #C45830.",
+    recommended_use = "Sequential scale for continuous magnitude; warm.",
+    cvd_note        = NULL,
+    white_note      = "The pale low end is light on white, as expected for a sequential ramp."
+  ),
+  steel = list(
+    domain          = "industrial",
+    source          = "Constructed sequential ramp (monotonic lightness) evoking steel; anchored on gost14202 pipe grey #78909C.",
+    recommended_use = "Sequential scale for continuous magnitude; cool/neutral.",
+    cvd_note        = NULL,
+    white_note      = "The pale low end is light on white, as expected for a sequential ramp."
+  ),
+  cobalt = list(
+    domain          = "industrial",
+    source          = "Constructed sequential ramp (monotonic lightness) anchored on gost14202 compressed-air blue #5B8DB8.",
+    recommended_use = "Sequential scale for continuous magnitude; blue.",
+    cvd_note        = NULL,
+    white_note      = "The pale low end is light on white, as expected for a sequential ramp."
+  ),
   soviet_military = list(
     domain          = "military",
     source          = "Vallejo 70.609, AK Real Colors RC206, FS equivalents.",
@@ -199,6 +247,13 @@
     ),
     cvd_note        = NULL,
     white_note      = "All stops are adequate on white backgrounds."
+  ),
+  field = list(
+    domain          = "military",
+    source          = "Constructed sequential ramp (monotonic lightness) anchored on 4BO Protective Green #51653F.",
+    recommended_use = "Sequential scale for continuous magnitude; the monotonic green alternative to steppe.",
+    cvd_note        = NULL,
+    white_note      = "The pale low end is light on white, as expected for a sequential ramp."
   ),
   lissitzky = list(
     domain          = "artistic",
@@ -246,8 +301,8 @@
     source          = "Assembled from gost14202 (green, red) plus a defined light-cream neutral midpoint.",
     recommended_use = paste0(
       "Diverging safe-to-danger scale with a light cream midpoint: green ",
-      "(safe/low) to cream (neutral) to red (danger/high). The most legible ",
-      "and attractive diverging option when colorblind safety is not required."
+      "(safe/low) to cream (neutral) to red (danger/high). For use when ",
+      "colorblind safety is not required."
     ),
     cvd_note        = paste0(
       "Green-red ends are hard to read under red-green color vision deficiency ",

@@ -1,8 +1,8 @@
 # Registering sovpal with paletteer
 
-[paletteer](https://github.com/EmilHvitfeldt/paletteer) is the de-facto
-aggregator for R color palettes. Registering sovpal there lets users reach
-every palette through a uniform interface they already know:
+[paletteer](https://github.com/EmilHvitfeldt/paletteer) is an aggregator for R
+color palettes. Registering sovpal there exposes its palettes through the
+paletteer interface:
 
 ```r
 paletteer::paletteer_d("sovpal::malevich")
