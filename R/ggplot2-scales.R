@@ -4,9 +4,8 @@
 #' A ggplot2 scale for the `colour` aesthetic using sovpal palettes.
 #'
 #' The scale uses the named palette exactly as defined -- no colors are dropped
-#' or interpolated for a discrete scale. For points and lines on a white
-#' background, request a visualization-optimized palette by name (e.g.
-#' `"gost14202_lines"`) rather than relying on hidden behavior.
+#' or interpolated for a discrete scale. See [sovpal_palettes()] for the full
+#' list, and [palette_info()] for per-color white-background contrast.
 #'
 #' Requires the \pkg{ggplot2} package.
 #'
@@ -22,12 +21,12 @@
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
 #'   library(ggplot2)
 #'
-#'   # White-background-safe lines palette
+#'   # An artwork-derived qualitative palette
 #'   ggplot(iris, aes(Sepal.Length, Sepal.Width, colour = Species)) +
 #'     geom_point() +
-#'     scale_color_sovpal("gost14202_lines")
+#'     scale_color_sovpal("malevich")
 #'
-#'   # Full GOST pipeline palette
+#'   # GOST pipeline palette
 #'   ggplot(iris, aes(Sepal.Length, Sepal.Width, colour = Species)) +
 #'     geom_point() +
 #'     scale_color_sovpal("gost14202")
@@ -75,9 +74,6 @@ scale_colour_sovpal <- function(...) scale_color_sovpal(...)
 #' A ggplot2 scale for the `fill` aesthetic using sovpal palettes. Uses the
 #' named palette exactly as defined.
 #'
-#' For `constructivist`, the cream stop (#E8DFC8) is low-contrast even as a bar
-#' fill; use the `"constructivist_core"` palette to exclude it.
-#'
 #' Requires the \pkg{ggplot2} package.
 #'
 #' @param palette Character. Palette name. Default `"gost14202"`.
@@ -102,10 +98,10 @@ scale_colour_sovpal <- function(...) scale_color_sovpal(...)
 #'     geom_tile() +
 #'     scale_fill_sovpal("hazard_cvd", discrete = FALSE)
 #'
-#'   # Constructivist without the low-contrast cream ground
+#'   # An artwork-derived palette as fill
 #'   ggplot(iris, aes(Species, Sepal.Length, fill = Species)) +
 #'     geom_boxplot() +
-#'     scale_fill_sovpal("constructivist_core")
+#'     scale_fill_sovpal("popova")
 #' }
 #'
 #' @export

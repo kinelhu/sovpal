@@ -8,10 +8,11 @@ sovpal(name, n = NULL, type = NULL, direction = 1)
 }
 \arguments{
 \item{name}{Character. Palette name (case-insensitive). See
-\code{\link[=sovpal_palettes]{sovpal_palettes()}} for the full list. Archival palettes:
-\code{"gost14202"}, \code{"soviet_military"}, \code{"constructivist"}, \code{"gost_signal"},
-\code{"steppe"}, \code{"hazard"}. Visualization-optimized palettes:
-\code{"gost14202_lines"}, \code{"constructivist_core"}, \code{"hazard_cvd"}.}
+\code{\link[=sovpal_palettes]{sovpal_palettes()}} for the full list, grouped by domain:
+industrial (\code{"gost14202"}, \code{"gost_signal"}), military
+(\code{"soviet_military"}, \code{"steppe"}), artistic (\code{"lissitzky"}, \code{"popova"},
+\code{"stepanova"}, \code{"malevich"}), and composite (\code{"hazard"}, \code{"hazard_warm"},
+\code{"hazard_cvd"}).}
 
 \item{n}{Integer or NULL. Number of colors to return. If \code{NULL}, returns all
 defined stops. If \code{n} exceeds the number of available stops, colors are
@@ -31,9 +32,8 @@ Returns a vector of hex color codes from a named Soviet/industrial color
 palette. All hex values are historically sourced and unmodified.
 
 To select or reorder colors, index the returned named vector with base R
-(e.g. \code{sovpal("gost14202")[c("water", "fire")]}). For white-background or
-colorblind-safe variants, request the corresponding visualization-optimized
-palette by name (e.g. \code{"gost14202_lines"}, \code{"hazard_cvd"}).
+(e.g. \code{sovpal("gost14202")[c("water", "fire")]}). For a colorblind-safe
+diverging scale, use \code{"hazard_cvd"}.
 }
 \examples{
 # Full 8-color GOST pipeline palette
@@ -48,8 +48,8 @@ sovpal("gost14202")[c("water", "fire", "air")]
 # Slice a sequential palette to skip a light anchor stop
 sovpal("steppe")[2:3]
 
-# White-background-safe lines palette
-sovpal("gost14202_lines")
+# An artwork-derived palette
+sovpal("malevich")
 
 # Interpolate 100 colors from steppe
 sovpal("steppe", n = 100, type = "continuous")

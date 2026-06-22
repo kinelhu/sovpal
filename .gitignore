@@ -5,3 +5,6 @@
 .Ruserdata
 *.Rproj
 data-raw/paletteer/
+# Full-size artwork source scans: large, and Stepanova is still under EU
+# copyright. Not redistributed. Re-fetch with the URLs in sample_artwork.R.
+data-raw/artwork/

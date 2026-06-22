@@ -10,17 +10,17 @@ palette_info(name)
 \item{name}{Character. Palette name (case-insensitive).}
 }
 \value{
-A named list with elements: \code{name}, \code{type}, \code{tier}, \code{evocative},
-\code{n_colors}, \code{color_names}, \code{hex_values}, \code{source}, \code{recommended_use},
-\code{cvd_note}, \code{derived_from}, \code{contrast_white} (WCAG contrast ratio of each
-color against white), \code{low_contrast_on_white} (colors below the WCAG 3:1
-non-text threshold), and \code{white_note}.
+A named list with elements: \code{name}, \code{domain}, \code{type}, \code{n_colors},
+\code{color_names}, \code{hex_values}, \code{source}, \code{recommended_use}, \code{cvd_note},
+\code{contrast_white} (WCAG contrast ratio of each color against white),
+\code{low_contrast_on_white} (colors below the WCAG 3:1 non-text threshold),
+and \code{white_note}.
 }
 \description{
-Returns a list describing a palette: its type, tier, color stops, provenance,
-intended use, colorblindness caveats, and computed white-background contrast.
-Contrast is derived from the hex values (WCAG relative luminance), not
-hand-maintained.
+Returns a list describing a palette: its domain, type, color stops,
+provenance, intended use, colorblindness caveats, and computed
+white-background contrast. Contrast is derived from the hex values (WCAG
+relative luminance), not hand-maintained.
 }
 \examples{
 palette_info("gost14202")

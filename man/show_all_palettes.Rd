@@ -4,27 +4,27 @@
 \alias{show_all_palettes}
 \title{Display all sovpal palettes}
 \usage{
-show_all_palettes(type = NULL, tier = NULL)
+show_all_palettes(type = NULL, domain = NULL)
 }
 \arguments{
 \item{type}{Character or NULL. If specified, show only palettes of this
 type: \code{"qualitative"}, \code{"sequential"}, or \code{"diverging"}.}
 
-\item{tier}{Character or NULL. If specified, show only palettes of this
-tier: \code{"archival"} or \code{"viz"}.}
+\item{domain}{Character or NULL. If specified, show only palettes of this
+domain: \code{"industrial"}, \code{"military"}, \code{"artistic"}, or \code{"composite"}.}
 }
 \value{
 Invisibly returns \code{NULL}. Called for its side effects.
 }
 \description{
 Renders palettes stacked vertically using base R graphics, one row per
-palette labeled with its name and type. Filter by color type and/or tier.
+palette labeled with its name and type. Filter by color type and/or domain.
 }
 \examples{
 \dontrun{
 show_all_palettes()
 show_all_palettes(type = "qualitative")
-show_all_palettes(tier = "archival")
+show_all_palettes(domain = "artistic")
 }
 
 }

@@ -5,15 +5,17 @@
 \alias{sovpal-package}
 \title{sovpal: Soviet and Industrial Color Palettes}
 \description{
-Color palettes derived from Soviet military paint standards, GOST industrial
-pipeline color codes, institutional architecture, and safety signage systems.
-All hex values are historically sourced and unmodified.
-
-Palettes come in two tiers. \emph{Archival} palettes are faithful to a source
-document or reference. \emph{Visualization-optimized} palettes (suffixed
-\verb{_lines}, \verb{_core}, \verb{_cvd}) select or reorder colors that already appear in an
-archival palette for distinctness, white-background contrast, or colorblind
-safety -- they never introduce a new hex value.
+Color palettes drawn from the Soviet industrial world. Each palette has a
+thematic \code{domain} and a functional \code{type} (qualitative / sequential /
+diverging):
+\itemize{
+\item \strong{industrial} -- GOST civil/industrial standards (\code{gost14202}, \code{gost_signal}).
+\item \strong{military}   -- Soviet military paint and camouflage (\code{soviet_military}, \code{steppe}).
+\item \strong{artistic}   -- avant-garde palettes color-sampled from specific artworks,
+named for the artist (\code{lissitzky}, \code{popova}, \code{stepanova}, \code{malevich}).
+\item \strong{composite}  -- functional diverging scales assembled from the others
+(\code{hazard}, \code{hazard_warm}, \code{hazard_cvd}).
+}
 
 To subset or slice a palette, index the returned named vector with base R,
 e.g. \code{sovpal("gost14202")[c("water", "fire")]} or \code{sovpal("steppe")[2:3]}.

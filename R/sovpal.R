@@ -1,15 +1,16 @@
 #' sovpal: Soviet and Industrial Color Palettes
 #'
 #' @description
-#' Color palettes derived from Soviet military paint standards, GOST industrial
-#' pipeline color codes, institutional architecture, and safety signage systems.
-#' All hex values are historically sourced and unmodified.
+#' Color palettes drawn from the Soviet industrial world. Each palette has a
+#' thematic `domain` and a functional `type` (qualitative / sequential /
+#' diverging):
 #'
-#' Palettes come in two tiers. *Archival* palettes are faithful to a source
-#' document or reference. *Visualization-optimized* palettes (suffixed
-#' `_lines`, `_core`, `_cvd`) select or reorder colors that already appear in an
-#' archival palette for distinctness, white-background contrast, or colorblind
-#' safety -- they never introduce a new hex value.
+#' * **industrial** -- GOST civil/industrial standards (`gost14202`, `gost_signal`).
+#' * **military**   -- Soviet military paint and camouflage (`soviet_military`, `steppe`).
+#' * **artistic**   -- avant-garde palettes color-sampled from specific artworks,
+#'   named for the artist (`lissitzky`, `popova`, `stepanova`, `malevich`).
+#' * **composite**  -- functional diverging scales assembled from the others
+#'   (`hazard`, `hazard_warm`, `hazard_cvd`).
 #'
 #' To subset or slice a palette, index the returned named vector with base R,
 #' e.g. `sovpal("gost14202")[c("water", "fire")]` or `sovpal("steppe")[2:3]`.
@@ -27,15 +28,15 @@
 #' palette. All hex values are historically sourced and unmodified.
 #'
 #' To select or reorder colors, index the returned named vector with base R
-#' (e.g. `sovpal("gost14202")[c("water", "fire")]`). For white-background or
-#' colorblind-safe variants, request the corresponding visualization-optimized
-#' palette by name (e.g. `"gost14202_lines"`, `"hazard_cvd"`).
+#' (e.g. `sovpal("gost14202")[c("water", "fire")]`). For a colorblind-safe
+#' diverging scale, use `"hazard_cvd"`.
 #'
 #' @param name Character. Palette name (case-insensitive). See
-#'   [sovpal_palettes()] for the full list. Archival palettes:
-#'   `"gost14202"`, `"soviet_military"`, `"constructivist"`, `"gost_signal"`,
-#'   `"steppe"`, `"hazard"`. Visualization-optimized palettes:
-#'   `"gost14202_lines"`, `"constructivist_core"`, `"hazard_cvd"`.
+#'   [sovpal_palettes()] for the full list, grouped by domain:
+#'   industrial (`"gost14202"`, `"gost_signal"`), military
+#'   (`"soviet_military"`, `"steppe"`), artistic (`"lissitzky"`, `"popova"`,
+#'   `"stepanova"`, `"malevich"`), and composite (`"hazard"`, `"hazard_warm"`,
+#'   `"hazard_cvd"`).
 #' @param n Integer or NULL. Number of colors to return. If `NULL`, returns all
 #'   defined stops. If `n` exceeds the number of available stops, colors are
 #'   interpolated (type is inferred as continuous).
@@ -59,8 +60,8 @@
 #' # Slice a sequential palette to skip a light anchor stop
 #' sovpal("steppe")[2:3]
 #'
-#' # White-background-safe lines palette
-#' sovpal("gost14202_lines")
+#' # An artwork-derived palette
+#' sovpal("malevich")
 #'
 #' # Interpolate 100 colors from steppe
 #' sovpal("steppe", n = 100, type = "continuous")
@@ -106,13 +107,13 @@ sovpal <- function(name, n = NULL, type = NULL, direction = 1) {
 #' List available sovpal palettes
 #'
 #' @description
-#' Returns a data frame describing every palette: its name, type, tier
-#' (archival or visualization-optimized), and number of color stops. Useful for
-#' programmatic discovery and for tools that ingest the package (e.g.
+#' Returns a data frame describing every palette: its name, domain (industrial,
+#' military, artistic, or composite), type, and number of color stops. Useful
+#' for programmatic discovery and for tools that ingest the package (e.g.
 #' \pkg{paletteer}).
 #'
-#' @return A data frame with columns `palette`, `type`, `tier`, and `n_colors`,
-#'   ordered as the palettes are defined.
+#' @return A data frame with columns `palette`, `domain`, `type`, and
+#'   `n_colors`, ordered as the palettes are defined.
 #'
 #' @examples
 #' sovpal_palettes()
@@ -122,9 +123,9 @@ sovpal_palettes <- function() {
   nms <- names(.sovpal_palettes)
   data.frame(
     palette  = nms,
-    type     = vapply(.sovpal_palettes, function(p) attr(p, "type"), character(1)),
-    tier     = vapply(nms, function(nm) .sovpal_meta[[nm]]$tier %||% NA_character_,
+    domain   = vapply(nms, function(nm) .sovpal_meta[[nm]]$domain %||% NA_character_,
                       character(1)),
+    type     = vapply(.sovpal_palettes, function(p) attr(p, "type"), character(1)),
     n_colors = vapply(.sovpal_palettes, length, integer(1)),
     row.names = NULL,
     stringsAsFactors = FALSE
@@ -197,12 +198,12 @@ show_palette <- function(name, notes = TRUE) {
 #'
 #' @description
 #' Renders palettes stacked vertically using base R graphics, one row per
-#' palette labeled with its name and type. Filter by color type and/or tier.
+#' palette labeled with its name and type. Filter by color type and/or domain.
 #'
 #' @param type Character or NULL. If specified, show only palettes of this
 #'   type: `"qualitative"`, `"sequential"`, or `"diverging"`.
-#' @param tier Character or NULL. If specified, show only palettes of this
-#'   tier: `"archival"` or `"viz"`.
+#' @param domain Character or NULL. If specified, show only palettes of this
+#'   domain: `"industrial"`, `"military"`, `"artistic"`, or `"composite"`.
 #'
 #' @return Invisibly returns `NULL`. Called for its side effects.
 #'
@@ -210,25 +211,25 @@ show_palette <- function(name, notes = TRUE) {
 #' \dontrun{
 #' show_all_palettes()
 #' show_all_palettes(type = "qualitative")
-#' show_all_palettes(tier = "archival")
+#' show_all_palettes(domain = "artistic")
 #' }
 #'
 #' @importFrom graphics par image mtext
 #' @export
-show_all_palettes <- function(type = NULL, tier = NULL) {
+show_all_palettes <- function(type = NULL, domain = NULL) {
   pals <- .sovpal_palettes
 
   if (!is.null(type)) {
     keep <- vapply(pals, function(p) identical(attr(p, "type"), type), logical(1))
     pals <- pals[keep]
   }
-  if (!is.null(tier)) {
-    keep <- vapply(names(pals), function(nm) identical(.sovpal_meta[[nm]]$tier, tier),
+  if (!is.null(domain)) {
+    keep <- vapply(names(pals), function(nm) identical(.sovpal_meta[[nm]]$domain, domain),
                    logical(1))
     pals <- pals[keep]
   }
   if (length(pals) == 0) {
-    stop("No palettes match the requested type/tier filter.", call. = FALSE)
+    stop("No palettes match the requested type/domain filter.", call. = FALSE)
   }
 
   n_pals    <- length(pals)
@@ -266,18 +267,18 @@ show_all_palettes <- function(type = NULL, tier = NULL) {
 #' Retrieve palette metadata
 #'
 #' @description
-#' Returns a list describing a palette: its type, tier, color stops, provenance,
-#' intended use, colorblindness caveats, and computed white-background contrast.
-#' Contrast is derived from the hex values (WCAG relative luminance), not
-#' hand-maintained.
+#' Returns a list describing a palette: its domain, type, color stops,
+#' provenance, intended use, colorblindness caveats, and computed
+#' white-background contrast. Contrast is derived from the hex values (WCAG
+#' relative luminance), not hand-maintained.
 #'
 #' @param name Character. Palette name (case-insensitive).
 #'
-#' @return A named list with elements: `name`, `type`, `tier`, `evocative`,
-#'   `n_colors`, `color_names`, `hex_values`, `source`, `recommended_use`,
-#'   `cvd_note`, `derived_from`, `contrast_white` (WCAG contrast ratio of each
-#'   color against white), `low_contrast_on_white` (colors below the WCAG 3:1
-#'   non-text threshold), and `white_note`.
+#' @return A named list with elements: `name`, `domain`, `type`, `n_colors`,
+#'   `color_names`, `hex_values`, `source`, `recommended_use`, `cvd_note`,
+#'   `contrast_white` (WCAG contrast ratio of each color against white),
+#'   `low_contrast_on_white` (colors below the WCAG 3:1 non-text threshold),
+#'   and `white_note`.
 #'
 #' @examples
 #' palette_info("gost14202")
@@ -297,16 +298,14 @@ palette_info <- function(name) {
 
   list(
     name                  = name,
+    domain                = meta$domain %||% NA_character_,
     type                  = attr(pal, "type"),
-    tier                  = meta$tier %||% NA_character_,
-    evocative             = isTRUE(meta$evocative),
     n_colors              = length(pal),
     color_names           = nms,
     hex_values            = hex,
     source                = meta$source %||% NA_character_,
     recommended_use       = meta$recommended_use,
     cvd_note              = meta$cvd_note,
-    derived_from          = meta$derived_from,
     contrast_white        = round(unname(contrast), 2),
     low_contrast_on_white = low,
     white_note            = meta$white_note

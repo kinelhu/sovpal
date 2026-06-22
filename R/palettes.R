@@ -1,16 +1,19 @@
-# Internal palette data. Hex values are historically sourced and must not be
-# modified. See the verification table in the package documentation.
+# Internal palette data. Each palette belongs to a thematic `domain` and has a
+# functional `type`. The two axes are independent (e.g. `steppe` is military +
+# sequential, `soviet_military` is military + qualitative).
 #
-# Palettes are grouped into two tiers:
-#   * "archival" -- canonical, faithful to a source document or reference.
-#   * "viz"      -- visualization-optimized. These NEVER introduce new hex
-#                   values: they only select or reorder colors that already
-#                   appear in an archival palette, for distinctness, contrast,
-#                   or colorblind safety.
+# Domains:
+#   * industrial -- GOST civil/industrial standards (faithful to the documents).
+#   * military   -- Soviet military paint and camouflage references.
+#   * artistic   -- avant-garde palettes sampled from specific artworks, named
+#                   for the artist (cf. MetBrewer). Hex values are approximate,
+#                   sampled from reproductions, not official.
+#   * composite  -- functional scales assembled from colors in the other
+#                   palettes (the diverging hazard family).
 
 .sovpal_palettes <- list(
 
-  # --- Qualitative (archival) ------------------------------------------------
+  # === industrial ============================================================
 
   gost14202 = structure(
     c(
@@ -26,6 +29,18 @@
     type = "qualitative"
   ),
 
+  gost_signal = structure(
+    c(
+      danger    = "#D32F2F",  # red    -- immediate danger, prohibition
+      caution   = "#FDD835",  # yellow -- warning, hazard indication
+      safe      = "#388E3C",  # green  -- safe condition, evacuation routes
+      mandatory = "#1565C0"   # blue   -- mandatory action, PPE required
+    ),
+    type = "qualitative"
+  ),
+
+  # === military ==============================================================
+
   soviet_military = structure(
     c(
       green_4bo  = "#51653F",  # 4BO Protective Green exterior
@@ -38,29 +53,6 @@
     type = "qualitative"
   ),
 
-  constructivist = structure(
-    c(
-      red    = "#CD2500",  # Soviet propaganda red
-      black  = "#1A1A1A",  # near-black
-      yellow = "#F9A825",  # signal/poster yellow
-      cream  = "#E8DFC8",  # cream ground (evocative; low contrast on white)
-      blue   = "#1565C0"   # deep propaganda blue
-    ),
-    type = "qualitative"
-  ),
-
-  gost_signal = structure(
-    c(
-      danger    = "#D32F2F",  # red    -- immediate danger, prohibition
-      caution   = "#FDD835",  # yellow -- warning, hazard indication
-      safe      = "#388E3C",  # green  -- safe condition, evacuation routes
-      mandatory = "#1565C0"   # blue   -- mandatory action, PPE required
-    ),
-    type = "qualitative"
-  ),
-
-  # --- Sequential (archival) -------------------------------------------------
-
   # 7K, 4BO, and 6K are documented Soviet camouflage paint standards.
   steppe = structure(
     c(
@@ -71,10 +63,61 @@
     type = "sequential"
   ),
 
-  # --- Diverging (archival) --------------------------------------------------
+  # === artistic ==============================================================
+  # Hex values sampled (k-means) from reproductions of specific works, then
+  # curated. Approximate -- see data-raw/sample_artwork.R.
 
-  # Stops sourced from gost14202: water green (safe), pipe grey (neutral),
-  # fire red (danger).
+  # El Lissitzky, "Beat the Whites with the Red Wedge" (1919).
+  lissitzky = structure(
+    c(
+      ground = "#EEEDDB",  # off-white paper field
+      red    = "#D84F24",  # the red wedge
+      black  = "#131312",  # black field / lettering
+      steel  = "#8E9396"   # blue-grey geometric elements
+    ),
+    type = "qualitative"
+  ),
+
+  # Liubov Popova, "Architectonic Painting" (1917).
+  popova = structure(
+    c(
+      red   = "#BF3E08",  # orange-red plane
+      blue  = "#2F4672",  # blue plane
+      green = "#455238",  # green plane
+      ochre = "#CC8F58",  # ochre / tan plane
+      black = "#1E2227"   # near-black plane
+    ),
+    type = "qualitative"
+  ),
+
+  # Varvara Stepanova, "Billiard Players" (1920).
+  stepanova = structure(
+    c(
+      charcoal = "#1C1B1C",  # dark ground
+      slate    = "#4E5753",  # cool grey-green
+      brick    = "#772821",  # brick-red accent
+      gold     = "#B9882A",  # ochre / gold
+      khaki    = "#C5C7B8"   # light khaki
+    ),
+    type = "qualitative"
+  ),
+
+  # Kazimir Malevich, "Suprematist Composition" (1916).
+  malevich = structure(
+    c(
+      navy  = "#161B49",  # deep blue plane
+      red   = "#B9592F",  # red beam (burnt)
+      gold  = "#CEA829",  # yellow / gold element
+      green = "#5D8169",  # green element
+      rose  = "#BB9E99"   # dusty rose plane
+    ),
+    type = "qualitative"
+  ),
+
+  # === composite =============================================================
+  # Functional scales assembled from colors in the palettes above.
+
+  # Diverging safe->danger from gost14202: water green, pipe grey, fire red.
   hazard = structure(
     c(
       "#2E7D32",  # gost14202 water green (safe)
@@ -84,63 +127,26 @@
     type = "diverging"
   ),
 
-  # --- Qualitative (viz-optimized) -------------------------------------------
-
-  # Lines-safe subset of gost14202: drops only gas (#F9A825), the one stop
-  # below the WCAG 3:1 contrast-on-white threshold (1.97) and thus hard to read
-  # as thin lines or small points on white. Every other stop -- including the
-  # dark fuel brown (contrast 9.32) -- reads fine on white and is retained. All
-  # hex values are exactly as defined in gost14202.
-  gost14202_lines = structure(
+  # Warm diverging with a light cream midpoint (the nicest-looking diverging
+  # option). green and red from gost14202; the cream is a defined light neutral
+  # chosen as the diverging zero-point. Green-red ends are NOT colorblind-safe;
+  # use hazard_cvd when that matters.
+  hazard_warm = structure(
     c(
-      water  = "#2E7D32",
-      fire   = "#C62828",
-      air    = "#5B8DB8",
-      toxic  = "#E64A19",
-      alkali = "#8E6EAF",
-      fuel   = "#5D4037",
-      other  = "#78909C"
-    ),
-    type = "qualitative"
-  ),
-
-  # constructivist without the low-contrast cream ground. All hex values are
-  # exactly as defined in constructivist.
-  constructivist_core = structure(
-    c(
-      red    = "#CD2500",
-      black  = "#1A1A1A",
-      yellow = "#F9A825",
-      blue   = "#1565C0"
-    ),
-    type = "qualitative"
-  ),
-
-  # --- Diverging (viz-optimized) ---------------------------------------------
-
-  # Colorblind-safe alternative to `hazard`. Blue-cream-red is distinguishable
-  # under deuteranopia/protanopia where green-red is not, and the light cream
-  # midpoint reads as a proper diverging zero-point. Every stop is a canonical
-  # sovpal hex: blue from gost_signal `mandatory` / constructivist `blue`,
-  # cream from constructivist `cream`, red from gost14202 `fire`.
-  hazard_cvd = structure(
-    c(
-      "#1565C0",  # blue  (safe / low)
-      "#E8DFC8",  # cream (neutral)
+      "#2E7D32",  # green (safe / low)
+      "#E8DFC8",  # cream (neutral, functional zero-point)
       "#C62828"   # red   (danger / high)
     ),
     type = "diverging"
   ),
 
-  # Warm diverging variant with a light cream midpoint. Aesthetically the
-  # nicest of the diverging set, but green-red ends are NOT colorblind-safe;
-  # use hazard_cvd when that matters. Every stop is a canonical sovpal hex:
-  # green from gost14202 `water`, cream from constructivist, red from
-  # gost14202 `fire`.
-  hazard_warm = structure(
+  # Colorblind-safe diverging: blue-cream-red is distinguishable under
+  # deuteranopia/protanopia. blue from gost_signal, red from gost14202; cream is
+  # the defined light neutral midpoint.
+  hazard_cvd = structure(
     c(
-      "#2E7D32",  # green (safe / low)
-      "#E8DFC8",  # cream (neutral)
+      "#1565C0",  # blue  (safe / low)
+      "#E8DFC8",  # cream (neutral, functional zero-point)
       "#C62828"   # red   (danger / high)
     ),
     type = "diverging"
@@ -149,122 +155,95 @@
 
 
 # Generic per-palette metadata. Plain-text only; does not alter any hex value.
-# Exposed via palette_info() and show_palette(). Accessibility is NOT encoded
-# by hand here -- contrast against white is computed from the hex values by
-# .sovpal_contrast_on_white(). This list carries only judgments that cannot be
-# derived: provenance, tier, intended use, and colorblindness caveats.
+# Accessibility is NOT encoded here -- contrast against white is computed from
+# the hex values by .sovpal_contrast_on_white(). This list carries only
+# judgments that cannot be derived: domain, provenance, intended use, and
+# colorblindness caveats.
 
 .sovpal_meta <- list(
   gost14202 = list(
-    tier            = "archival",
-    evocative       = FALSE,
+    domain          = "industrial",
     source          = "GOST 14202-69 industrial pipeline paint card index.",
     recommended_use = NULL,
     cvd_note        = NULL,
-    derived_from    = NULL,
     white_note      = paste0(
       "8 colors at the upper edge of qualitative distinctness. Only the light ",
-      "`gas` yellow is below the 3:1 contrast threshold on white; for thin ",
-      "lines or small points use the `gost14202_lines` palette, which drops it."
-    )
-  ),
-  soviet_military = list(
-    tier            = "archival",
-    evocative       = FALSE,
-    source          = "Vallejo 70.609, AK Real Colors RC206, FS equivalents.",
-    recommended_use = NULL,
-    cvd_note        = NULL,
-    derived_from    = NULL,
-    white_note      = "Full palette is adequate on white backgrounds."
-  ),
-  constructivist = list(
-    tier            = "archival",
-    evocative       = TRUE,
-    source          = "Evocative of Soviet Constructivist poster design; not standards-derived.",
-    recommended_use = NULL,
-    cvd_note        = NULL,
-    derived_from    = NULL,
-    white_note      = paste0(
-      "The cream stop (#E8DFC8) is near-invisible on white. Use the ",
-      "`constructivist_core` palette for a 4-color white-safe version."
+      "`gas` yellow falls below the 3:1 contrast threshold on white."
     )
   ),
   gost_signal = list(
-    tier            = "archival",
-    evocative       = FALSE,
+    domain          = "industrial",
     source          = "GOST 12.4.026 mandatory workplace safety signal colors.",
     recommended_use = NULL,
     cvd_note        = NULL,
-    derived_from    = NULL,
     white_note      = "The light `caution` yellow reads best as a fill rather than a thin line."
   ),
-  steppe = list(
-    tier            = "archival",
-    evocative       = FALSE,
-    source          = "Soviet camouflage paint standards 7K / 4BO / 6K.",
+  soviet_military = list(
+    domain          = "military",
+    source          = "Vallejo 70.609, AK Real Colors RC206, FS equivalents.",
     recommended_use = paste0(
-      "Themed ramp. Note: lightness is not monotonic (sand is light, green ",
-      "mid, brown dark, with a hue swing), so it encodes magnitude less ",
-      "cleanly than a perceptually uniform sequential scale."
+      "Earth-toned camouflage set. `primer` sits close to `soviet_red`; drop ",
+      "it with sovpal('soviet_military')[-3] for a more distinct qualitative ",
+      "palette with a single clean red."
     ),
     cvd_note        = NULL,
-    derived_from    = NULL,
+    white_note      = "Full palette is adequate on white backgrounds."
+  ),
+  steppe = list(
+    domain          = "military",
+    source          = "Soviet camouflage paint standards 7K / 4BO / 6K.",
+    recommended_use = paste0(
+      "Themed terrain ramp. Lightness is not strictly monotonic (sand light, ",
+      "green mid, brown dark, with a hue swing), so it reads as terrain more ",
+      "than as a strict magnitude scale."
+    ),
+    cvd_note        = NULL,
     white_note      = "All stops are adequate on white backgrounds."
   ),
+  lissitzky = list(
+    domain          = "artistic",
+    source          = "Color-sampled from a reproduction of El Lissitzky, 'Beat the Whites with the Red Wedge' (1919). Approximate.",
+    recommended_use = NULL,
+    cvd_note        = NULL,
+    white_note      = "The off-white `ground` is the work's paper field; low-contrast on white."
+  ),
+  popova = list(
+    domain          = "artistic",
+    source          = "Color-sampled from a reproduction of Liubov Popova, 'Architectonic Painting' (1917). Approximate.",
+    recommended_use = NULL,
+    cvd_note        = NULL,
+    white_note      = "Layered painterly planes; all stops read on white."
+  ),
+  stepanova = list(
+    domain          = "artistic",
+    source          = "Color-sampled from a reproduction of Varvara Stepanova, 'Billiard Players' (1920). Approximate.",
+    recommended_use = NULL,
+    cvd_note        = NULL,
+    white_note      = "Muted cubo-futurist earth and stone tones; all stops read on white."
+  ),
+  malevich = list(
+    domain          = "artistic",
+    source          = "Color-sampled from a reproduction of Kazimir Malevich, 'Suprematist Composition' (1916). Approximate.",
+    recommended_use = NULL,
+    cvd_note        = NULL,
+    white_note      = "All stops read on white; the dusty `rose` is the faintest."
+  ),
   hazard = list(
-    tier            = "archival",
-    evocative       = FALSE,
-    source          = "GOST 14202-69 green, grey, red.",
+    domain          = "composite",
+    source          = "Assembled from gost14202 (green, grey, red).",
     recommended_use = paste0(
       "Diverging safe-to-danger scale for risk scores, hazard ratios, and ",
       "survival data: green (safe/low) to grey (neutral) to red (danger/high)."
     ),
     cvd_note        = paste0(
       "Green-red diverging scales are hard to read under red-green color ",
-      "vision deficiency (~8% of men). For audiences where this matters, ",
-      "use the `hazard_cvd` palette instead."
+      "vision deficiency (~8% of men); use `hazard_cvd` for those audiences."
     ),
-    derived_from    = NULL,
     white_note      = "All stops are adequate on white backgrounds."
-  ),
-  gost14202_lines = list(
-    tier            = "viz",
-    evocative       = FALSE,
-    source          = "Subset of gost14202 (GOST 14202-69); no hex values altered.",
-    recommended_use = "Lines/points on white backgrounds. gost14202 with only the low-contrast `gas` yellow removed.",
-    cvd_note        = NULL,
-    derived_from    = "gost14202",
-    white_note      = "All stops are adequate for points and lines on white."
-  ),
-  constructivist_core = list(
-    tier            = "viz",
-    evocative       = TRUE,
-    source          = "Subset of constructivist; no hex values altered.",
-    recommended_use = "White-safe Constructivist palette (cream ground removed).",
-    cvd_note        = NULL,
-    derived_from    = "constructivist",
-    white_note      = "All stops are adequate on white backgrounds."
-  ),
-  hazard_cvd = list(
-    tier            = "viz",
-    evocative       = FALSE,
-    source          = "Canonical sovpal hexes recombined (gost_signal/constructivist blue, constructivist cream, gost14202 red).",
-    recommended_use = paste0(
-      "Colorblind-safe diverging safe-to-danger scale: blue (safe/low) to ",
-      "cream (neutral) to red (danger/high). Use in place of `hazard` when ",
-      "red-green color vision deficiency is a concern."
-    ),
-    cvd_note        = "Distinguishable under deuteranopia and protanopia.",
-    derived_from    = "hazard",
-    white_note      = paste0(
-      "The light cream midpoint is near-white; it reads as a zero-point in a ",
-      "gradient but is not meant as a standalone discrete swatch."
-    )
   ),
   hazard_warm = list(
-    tier            = "viz",
-    evocative       = FALSE,
-    source          = "Canonical sovpal hexes recombined (gost14202 green + red, constructivist cream).",
+    domain          = "composite",
+    source          = "Assembled from gost14202 (green, red) plus a defined light-cream neutral midpoint.",
     recommended_use = paste0(
       "Diverging safe-to-danger scale with a light cream midpoint: green ",
       "(safe/low) to cream (neutral) to red (danger/high). The most legible ",
@@ -274,26 +253,38 @@
       "Green-red ends are hard to read under red-green color vision deficiency ",
       "(~8% of men). Use `hazard_cvd` for those audiences."
     ),
-    derived_from    = "hazard",
     white_note      = paste0(
-      "The light cream midpoint is near-white; it reads as a zero-point in a ",
-      "gradient but is not meant as a standalone discrete swatch."
+      "The light cream midpoint reads as a zero-point in a gradient but is not ",
+      "meant as a standalone discrete swatch."
+    )
+  ),
+  hazard_cvd = list(
+    domain          = "composite",
+    source          = "Assembled from gost_signal (blue) and gost14202 (red) plus a defined light-cream neutral midpoint.",
+    recommended_use = paste0(
+      "Colorblind-safe diverging safe-to-danger scale: blue (safe/low) to ",
+      "cream (neutral) to red (danger/high). Use in place of `hazard` when ",
+      "red-green color vision deficiency is a concern."
+    ),
+    cvd_note        = "Distinguishable under deuteranopia and protanopia.",
+    white_note      = paste0(
+      "The light cream midpoint reads as a zero-point in a gradient but is not ",
+      "meant as a standalone discrete swatch."
     )
   )
 )
 
 
-# Relative luminance of an sRGB hex color, per WCAG 2.x.
-# Returns a numeric in [0, 1].
+# Relative luminance of an sRGB hex color, per WCAG 2.x. Returns [0, 1].
 .sovpal_luminance <- function(hex) {
   rgb  <- grDevices::col2rgb(hex)[, 1] / 255
   lin  <- ifelse(rgb <= 0.03928, rgb / 12.92, ((rgb + 0.055) / 1.055)^2.4)
   sum(c(0.2126, 0.7152, 0.0722) * lin)
 }
 
-# WCAG contrast ratio of each hex color against a white background.
-# Ranges from 1 (identical to white) to 21 (black on white). The WCAG 2.1
-# minimum for non-text graphical objects (lines, markers) is 3:1.
+# WCAG contrast ratio of each hex color against a white background. Ranges from
+# 1 (identical to white) to 21 (black on white). The WCAG 2.1 minimum for
+# non-text graphical objects (lines, markers) is 3:1.
 .sovpal_contrast_on_white <- function(hex) {
   vapply(
     hex,

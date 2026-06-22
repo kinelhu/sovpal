@@ -1,3 +1,39 @@
+# sovpal 0.3.0
+
+Reorganizes the package around thematic **domains** and introduces
+artwork-derived palettes. Breaking changes (still lifecycle-experimental).
+
+## Taxonomy
+
+* Palettes are now grouped by **domain** (`industrial`, `military`, `artistic`,
+  `composite`) instead of the previous archival/visualization-optimized tier.
+  `palette_info()` gains `domain` and drops `tier`, `evocative`, and
+  `derived_from`; `sovpal_palettes()` gains a `domain` column; and
+  `show_all_palettes()` takes a `domain` filter (was `tier`).
+
+## New: artistic palettes (MetBrewer-style)
+
+* `lissitzky`, `popova`, `stepanova`, and `malevich` are color-sampled from
+  specific Constructivist/Suprematist works and named for the artist. Hex values
+  are approximate (sampled from reproductions; see `data-raw/sample_artwork.R`).
+* The vignette presents each public-domain work as a scan beside its palette.
+  Stepanova's image is not bundled (still under EU copyright until 2029); her
+  palette is shown as swatches with a link.
+
+## Removed
+
+* `constructivist` and `constructivist_core` (superseded by the artwork
+  palettes) and `gost14202_lines` (the single low-contrast `gas` yellow is now
+  just reported by `palette_info()`, not split into a separate palette).
+
+## Composite diverging palettes
+
+* `hazard` (archival GOST green/grey/red), `hazard_warm` (green/cream/red), and
+  `hazard_cvd` (blue/cream/red, colorblind-safe) are now grouped as the
+  `composite` domain. Their cream midpoint is a defined light neutral.
+
+---
+
 # sovpal 0.2.0
 
 This release simplifies the API, removes a footgun, and improves

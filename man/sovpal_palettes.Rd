@@ -7,13 +7,13 @@
 sovpal_palettes()
 }
 \value{
-A data frame with columns \code{palette}, \code{type}, \code{tier}, and \code{n_colors},
-ordered as the palettes are defined.
+A data frame with columns \code{palette}, \code{domain}, \code{type}, and
+\code{n_colors}, ordered as the palettes are defined.
 }
 \description{
-Returns a data frame describing every palette: its name, type, tier
-(archival or visualization-optimized), and number of color stops. Useful for
-programmatic discovery and for tools that ingest the package (e.g.
+Returns a data frame describing every palette: its name, domain (industrial,
+military, artistic, or composite), type, and number of color stops. Useful
+for programmatic discovery and for tools that ingest the package (e.g.
 \pkg{paletteer}).
 }
 \examples{

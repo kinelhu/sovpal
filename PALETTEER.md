@@ -5,9 +5,9 @@ aggregator for R color palettes. Registering sovpal there lets users reach
 every palette through a uniform interface they already know:
 
 ```r
-paletteer::paletteer_d("sovpal::gost14202_lines")
+paletteer::paletteer_d("sovpal::malevich")
 paletteer::paletteer_c("sovpal::hazard_cvd", n = 50)
-ggplot2::... + paletteer::scale_color_paletteer_d("sovpal::gost14202_lines")
+ggplot2::... + paletteer::scale_color_paletteer_d("sovpal::malevich")
 ```
 
 sovpal is structured to make ingestion mechanical:

@@ -1,16 +1,17 @@
 Package: sovpal
 Title: Soviet and Industrial Color Palettes
-Version: 0.2.0
+Version: 0.3.0
 Authors@R:
     person("Kinan", "El Husseini", email = "kinelhu@gmail.com",
            role = c("aut", "cre"))
 Description: Color palettes derived from Soviet military paint standards, GOST
-    industrial pipeline color codes, institutional architecture, and safety
-    signage systems. All colors are historically sourced. Archival palettes are
-    faithful to their source documents; visualization-optimized palettes select
-    or reorder those same colors for distinctness, white-background contrast,
-    and colorblind safety without introducing new values. Includes ggplot2
-    scale functions and is structured for ingestion into 'paletteer'.
+    industrial pipeline color codes, safety signage, and avant-garde artworks.
+    Each palette has a thematic domain (industrial, military, artistic, or
+    composite) and a functional type (qualitative, sequential, or diverging).
+    Artistic palettes are color-sampled from specific Constructivist and
+    Suprematist works. Includes ggplot2 scale functions, computed
+    white-background contrast reporting, and is structured for ingestion into
+    'paletteer'.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -22,6 +23,7 @@ Imports:
     graphics
 Suggests:
     ggplot2,
+    jpeg,
     testthat (>= 3.0.0),
     knitr,
     rmarkdown

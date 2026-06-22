@@ -20,6 +20,7 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(sovpal)
 has_ggplot2 <- requireNamespace("ggplot2", quietly = TRUE)
+has_jpeg    <- requireNamespace("jpeg", quietly = TRUE)
 ```
 
 ```{r theme, include = FALSE}
@@ -40,17 +41,35 @@ if (has_ggplot2) {
   }
   theme_set(theme_sovpal())
 }
+
+# Draw an artwork thumbnail beside its sampled palette (MetBrewer style).
+lum <- function(hex) {
+  rgb <- grDevices::col2rgb(hex) / 255
+  colSums(c(0.2126, 0.7152, 0.0722) * rgb)
+}
+art_plot <- function(img_path, pal_name, caption) {
+  im   <- jpeg::readJPEG(img_path)
+  cols <- sovpal(pal_name); n <- length(cols)
+  layout(matrix(1:2, nrow = 1), widths = c(1, 1.25))
+  par(mar = c(0.4, 0.4, 2, 0.4))
+  plot.new(); plot.window(c(0, 1), c(0, 1)); rasterImage(im, 0, 0, 1, 1)
+  title(caption, font.main = 2, cex.main = 1)
+  par(mar = c(0.4, 0.4, 2, 0.4))
+  plot.new(); plot.window(c(0, n), c(0, 1))
+  rect(0:(n - 1), 0, 1:n, 1, col = cols, border = "grey25", lwd = 1.5)
+  text((0:(n - 1)) + 0.5, 0.5, names(cols), srt = 90, cex = 0.8,
+       col = ifelse(lum(cols) > 0.5, "grey10", "white"))
+}
 ```
 
-`sovpal` provides color palettes drawn from the Soviet industrial world — GOST
-pipeline-identification standards, military paint specifications, safety
-signage, and Constructivist graphic design. The colors are historically
-sourced, and many of them *mean something*: in GOST 14202-69, green is water,
-red is fire suppression, yellow is gas.
+`sovpal` provides color palettes drawn from the Soviet world — GOST
+pipeline-identification standards, military paint specifications, and the
+palettes of avant-garde artworks. Colors are historically sourced, and many of
+them *mean something*: in GOST 14202-69, green is water, red is fire
+suppression, yellow is gas.
 
 ```{r hero, eval = has_ggplot2, fig.height = 4.6, echo = FALSE}
 # Hero: terrain elevation in the `steppe` camouflage ramp, with contour ruling.
-# Sequential color + technical-drawing contours = the whole package in one image.
 v <- expand.grid(row = seq_len(nrow(volcano)), col = seq_len(ncol(volcano)))
 v$elev <- as.vector(volcano)
 
@@ -59,35 +78,31 @@ ggplot(v, aes(col, row, fill = elev)) +
   geom_contour(aes(z = elev), colour = "grey15", linewidth = 0.15, bins = 12) +
   scale_fill_sovpal("steppe", discrete = FALSE, name = "Elevation") +
   coord_equal(expand = FALSE) +
-  labs(
-    title    = "sovpal",
-    subtitle = "steppe (7K / 4BO / 6K camouflage) over terrain elevation"
-  ) +
+  labs(title = "sovpal",
+       subtitle = "steppe (7K / 4BO / 6K camouflage) over terrain elevation") +
   theme(axis.title = element_blank(), axis.text = element_blank(),
         axis.ticks = element_blank())
 ```
 
-## The palettes at a glance
+## Palettes by domain
 
-```{r gallery, fig.height = 6}
-show_all_palettes()
-```
-
-Six **archival** palettes are faithful to a source document or reference; three
-**visualization-optimized** palettes (`_lines`, `_core`, `_cvd`, plus the warm
-diverging variant) reuse those exact hex values, reordered or filtered for
-contrast and colorblind safety. `sovpal_palettes()` lists them all:
+Each palette has a thematic **domain** and a functional **type**
+(qualitative / sequential / diverging):
 
 ```{r enumerate}
 sovpal_palettes()
 ```
 
-## Colors that mean something
+```{r gallery, fig.height = 7}
+show_all_palettes()
+```
 
-The distinctive thing about the GOST palettes is *semantic* color: each name
-maps to a fixed meaning. Because `sovpal()` returns a **named** vector, you can
-map categories to their correct colors with `scale_*_manual()` — water is always
-green, gas always yellow, regardless of plotting order.
+## Industrial — colors that mean something
+
+The distinctive thing about the GOST palettes is *semantic* color. Because
+`sovpal()` returns a **named** vector, you can map categories to their correct
+colors with `scale_*_manual()` — water is always green, gas always yellow,
+regardless of plotting order.
 
 ```{r pipeline, eval = has_ggplot2, fig.height = 4}
 set.seed(1969)
@@ -103,93 +118,17 @@ flow$fluid <- factor(flow$fluid, levels = fluids)
 ggplot(flow, aes(year, throughput, fill = fluid)) +
   geom_area(colour = "grey15", linewidth = 0.15) +
   scale_fill_manual(values = sovpal("gost14202")) +
-  labs(
-    title    = "Pipeline throughput by fluid category",
-    subtitle = "GOST 14202-69 colors mapped to their meanings (green = water, red = fire main)",
-    x = NULL, y = "Throughput", fill = "Fluid"
-  )
+  labs(title = "Pipeline throughput by fluid category",
+       subtitle = "GOST 14202-69 colors mapped to their meanings",
+       x = NULL, y = "Throughput", fill = "Fluid")
 ```
 
-## Two tiers: archival vs. visualization-optimized
+## Military — paint and camouflage
 
-Faithful palettes are not always plot-ready. In `gost14202`, the pale `gas`
-yellow has a contrast ratio of only 1.97 against white, so it washes out as thin
-lines or small points (every other stop, including the dark `fuel` brown at
-9.32, reads fine). Rather than silently dropping it, sovpal ships an explicit
-`gost14202_lines` palette — the choice is visible in your code.
+`soviet_military` is an earth-toned set of period vehicle and aircraft colors;
+`steppe` (the hero image above) is the camouflage terrain ramp.
 
-```{r tier-before, eval = has_ggplot2, fig.height = 3.4}
-pts <- data.frame(
-  x = rep(seq_along(fluids), each = 12) + rnorm(12 * 8, 0, 0.12),
-  y = rnorm(12 * 8),
-  fluid = factor(rep(fluids, each = 12), levels = fluids)
-)
-
-ggplot(pts, aes(x, y, colour = fluid)) +
-  geom_point(size = 2.6) +
-  scale_color_sovpal("gost14202") +
-  labs(title = "Full gost14202 (8 colors)",
-       subtitle = "gas (yellow) barely reads as points on white",
-       x = NULL, y = NULL)
-```
-
-```{r tier-after, eval = has_ggplot2, fig.height = 3.4}
-lines_fluids <- names(sovpal("gost14202_lines"))
-ggplot(subset(pts, fluid %in% lines_fluids), aes(x, y, colour = fluid)) +
-  geom_point(size = 2.6) +
-  scale_color_sovpal("gost14202_lines") +
-  labs(title = "gost14202_lines (7 colors)",
-       subtitle = "the same palette minus the one washed-out yellow",
-       x = NULL, y = NULL)
-```
-
-## Sequential and diverging
-
-`steppe` is a camouflage terrain ramp (sand → protective green → dark brown).
-Its lightness is not strictly monotonic, so it reads as terrain more than as a
-strict magnitude scale — which is exactly what the hero image uses it for.
-
-For diverging scales the midpoint should be the *lightest* point. The
-visualization-optimized diverging palettes use a light cream center; the
-prettiest is `hazard_warm` (green → cream → red):
-
-```{r diverging-warm, eval = has_ggplot2, fig.height = 4.4}
-v$centered <- v$elev - mean(v$elev)
-lim <- max(abs(v$centered))
-
-ggplot(v, aes(col, row, fill = centered)) +
-  geom_raster() +
-  scale_fill_sovpal("hazard_warm", discrete = FALSE,
-                    limits = c(-lim, lim), name = "Δ elev") +
-  coord_equal(expand = FALSE) +
-  labs(title = "hazard_warm", subtitle = "green / cream / red — light center, dark arms") +
-  theme(axis.title = element_blank(), axis.text = element_blank(),
-        axis.ticks = element_blank())
-```
-
-When red–green colorblindness matters, `hazard_cvd` (blue → cream → red) carries
-the same safe-to-danger meaning with distinguishable hues:
-
-```{r diverging-cvd, eval = has_ggplot2, fig.height = 4.4}
-ggplot(v, aes(col, row, fill = centered)) +
-  geom_raster() +
-  scale_fill_sovpal("hazard_cvd", discrete = FALSE,
-                    limits = c(-lim, lim), name = "Δ elev") +
-  coord_equal(expand = FALSE) +
-  labs(title = "hazard_cvd", subtitle = "colorblind-safe alternative") +
-  theme(axis.title = element_blank(), axis.text = element_blank(),
-        axis.ticks = element_blank())
-```
-
-The archival `hazard` (green / grey / red) keeps its faithful GOST values and is
-intended as the historical record rather than the default plotting choice.
-
-## Qualitative distributions
-
-When the colors are just an attractive qualitative set, `soviet_military` gives
-six muted, period-correct hues:
-
-```{r densities, eval = has_ggplot2, fig.height = 3.8}
+```{r military, eval = has_ggplot2, fig.height = 3.8}
 set.seed(42)
 classes <- names(sovpal("soviet_military"))
 dens <- data.frame(
@@ -197,71 +136,105 @@ dens <- data.frame(
             rnorm(200, 7), rnorm(200, 5.5), rnorm(200, 8)),
   class = factor(rep(classes, each = 200), levels = classes)
 )
-
 ggplot(dens, aes(value, fill = class)) +
   geom_density(alpha = 0.65, colour = "grey15", linewidth = 0.2) +
   scale_fill_sovpal("soviet_military") +
   labs(title = "soviet_military", x = NULL, y = "Density", fill = NULL)
 ```
 
+## Artistic — palettes from the avant-garde
+
+Each artistic palette is **color-sampled from a specific artwork** and named for
+the artist (cf. \pkg{MetBrewer}). The hex values are approximate, sampled from
+reproductions — see `data-raw/sample_artwork.R`.
+
+```{r art-lissitzky, eval = has_jpeg, fig.height = 2.6, echo = FALSE}
+art_plot("artwork/lissitzky.jpg", "lissitzky",
+         "El Lissitzky — Beat the Whites with the Red Wedge (1919)")
+```
+
+```{r art-popova, eval = has_jpeg, fig.height = 2.6, echo = FALSE}
+art_plot("artwork/popova.jpg", "popova",
+         "Liubov Popova — Architectonic Painting (1917)")
+```
+
+```{r art-malevich, eval = has_jpeg, fig.height = 2.6, echo = FALSE}
+art_plot("artwork/malevich.jpg", "malevich",
+         "Kazimir Malevich — Suprematist Composition (1916)")
+```
+
+`stepanova` is sampled from Varvara Stepanova's *Billiard Players* (1920) — a
+muted cubo-futurist work of charcoal, slate, brick, gold, and khaki. Her work is
+still under copyright in the EU (she died in 1958), so the image is not bundled;
+[view it at the Museo Thyssen-Bornemisza](https://www.museothyssen.org/en/collection/artists/stepanova-varvara/billiard-players).
+
+```{r art-stepanova, fig.height = 1.7}
+show_palette("stepanova", notes = FALSE)
+```
+
+## Composite — diverging scales
+
+For a diverging scale the midpoint should be the *lightest* point. The composite
+diverging palettes use a light cream center; `hazard_warm` (green → cream → red)
+is the most legible:
+
+```{r diverging-warm, eval = has_ggplot2, fig.height = 4.4}
+v$centered <- v$elev - mean(v$elev)
+lim <- max(abs(v$centered))
+ggplot(v, aes(col, row, fill = centered)) +
+  geom_raster() +
+  scale_fill_sovpal("hazard_warm", discrete = FALSE,
+                    limits = c(-lim, lim), name = "Δ elev") +
+  coord_equal(expand = FALSE) +
+  labs(title = "hazard_warm", subtitle = "green / cream / red") +
+  theme(axis.title = element_blank(), axis.text = element_blank(),
+        axis.ticks = element_blank())
+```
+
+When red–green colorblindness matters, `hazard_cvd` (blue → cream → red) carries
+the same safe-to-danger meaning with distinguishable hues. The archival `hazard`
+(green / grey / red) keeps its faithful GOST values as the historical record.
+
 ## Usage
 
 ```{r usage}
 # Retrieve a palette (named vector)
-sovpal("gost14202")
+sovpal("malevich")
 
 # n colors, or interpolate a continuous ramp
 sovpal("gost14202", n = 4)
 length(sovpal("steppe", n = 100, type = "continuous"))
 
-# Slice or subset with base-R indexing — no special arguments
+# Slice or subset with base-R indexing
 sovpal("gost14202")[c("water", "fire", "air")]
 ```
 
-`palette_info()` reports provenance, intended use, colorblindness caveats, and
-**computed** white-background contrast (WCAG ratio; the 3:1 line is the non-text
-threshold):
+`palette_info()` reports domain, provenance, intended use, colorblindness
+caveats, and **computed** white-background contrast (WCAG ratio; 3:1 is the
+non-text threshold). Lissitzky's off-white ground is flagged automatically:
 
 ```{r info}
-info <- palette_info("constructivist")
+info <- palette_info("lissitzky")
 info$source
 info$contrast_white
-info$low_contrast_on_white   # cream and yellow fall below 3:1
-```
-
-ggplot2 scales are provided for both aesthetics: `scale_color_sovpal()` /
-`scale_colour_sovpal()` and `scale_fill_sovpal()`, each with `discrete` and
-`direction` arguments. Base R works directly, since `sovpal()` returns a plain
-vector:
-
-```{r base-r, fig.height = 3.2}
-barplot(rep(1, 8), col = sovpal("gost14202"), border = "grey15",
-        names.arg = names(sovpal("gost14202")), las = 2, cex.names = 0.7,
-        axes = FALSE)
+info$low_contrast_on_white
 ```
 
 ## Historical notes
 
 **GOST 14202-69 — pipeline identification.** Adopted in 1969, it standardized
 the color-coding of industrial pipelines across all Soviet enterprises: eight
-base colors for fluid categories, referenced by paint card number. The system
-remains in use in post-Soviet facilities under inherited technical regulations.
+base colors for fluid categories, referenced by paint card number.
 
-**GOST 12.4.026 — safety signage.** Four signal colors encoding hierarchical
-urgency: red (danger, prohibition), yellow (caution), green (safe, evacuation),
-blue (mandatory action, PPE).
+**GOST 12.4.026 — safety signage.** Four signal colors encoding urgency: red
+(danger), yellow (caution), green (safe), blue (mandatory action).
 
 **4BO Protective Green (`#51653F`).** The canonical Soviet vehicle exterior
-color, adopted in the 1930s and used through WWII and the Cold War. Based on
-Vallejo 70.609 and corroborated by AK Interactive measurements of surviving
-vehicles. It appears in `soviet_military` and as `steppe`'s middle stop.
+color, used from the 1930s through the Cold War; based on Vallejo 70.609. It
+appears in `soviet_military` and as `steppe`'s middle stop.
 
-**Cockpit turquoise (`#5B8F8C`).** The grey-turquoise of Soviet aircraft
-interiors from the 1940s–1970s (MiG-15 through Su-27), derived from AK Real
-Colors RC206.
-
-**Constructivism.** The 1920s–30s poster language of red, black, and white with
-yellow and blue accents. `constructivist` is *evocative* of this corpus, not
-standards-derived; its cream (`#E8DFC8`) recalls the aged paper ground and is
-low-contrast on white — hence `constructivist_core`.
+**The avant-garde palettes.** `lissitzky`, `popova`, `stepanova`, and `malevich`
+are color-sampled from reproductions of specific Constructivist and Suprematist
+works (1916–1920). They are evocative of those works rather than authoritative
+color records.
 ```

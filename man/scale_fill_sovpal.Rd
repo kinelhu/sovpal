@@ -23,9 +23,6 @@ A ggplot2 scale object.
 A ggplot2 scale for the \code{fill} aesthetic using sovpal palettes. Uses the
 named palette exactly as defined.
 
-For \code{constructivist}, the cream stop (#E8DFC8) is low-contrast even as a bar
-fill; use the \code{"constructivist_core"} palette to exclude it.
-
 Requires the \pkg{ggplot2} package.
 }
 \examples{
@@ -42,10 +39,10 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
     geom_tile() +
     scale_fill_sovpal("hazard_cvd", discrete = FALSE)
 
-  # Constructivist without the low-contrast cream ground
+  # An artwork-derived palette as fill
   ggplot(iris, aes(Species, Sepal.Length, fill = Species)) +
     geom_boxplot() +
-    scale_fill_sovpal("constructivist_core")
+    scale_fill_sovpal("popova")
 }
 
 }

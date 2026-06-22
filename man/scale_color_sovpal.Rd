@@ -26,9 +26,8 @@ A ggplot2 scale object.
 A ggplot2 scale for the \code{colour} aesthetic using sovpal palettes.
 
 The scale uses the named palette exactly as defined -- no colors are dropped
-or interpolated for a discrete scale. For points and lines on a white
-background, request a visualization-optimized palette by name (e.g.
-\code{"gost14202_lines"}) rather than relying on hidden behavior.
+or interpolated for a discrete scale. See \code{\link[=sovpal_palettes]{sovpal_palettes()}} for the full
+list, and \code{\link[=palette_info]{palette_info()}} for per-color white-background contrast.
 
 Requires the \pkg{ggplot2} package.
 }
@@ -36,12 +35,12 @@ Requires the \pkg{ggplot2} package.
 if (requireNamespace("ggplot2", quietly = TRUE)) {
   library(ggplot2)
 
-  # White-background-safe lines palette
+  # An artwork-derived qualitative palette
   ggplot(iris, aes(Sepal.Length, Sepal.Width, colour = Species)) +
     geom_point() +
-    scale_color_sovpal("gost14202_lines")
+    scale_color_sovpal("malevich")
 
-  # Full GOST pipeline palette
+  # GOST pipeline palette
   ggplot(iris, aes(Sepal.Length, Sepal.Width, colour = Species)) +
     geom_point() +
     scale_color_sovpal("gost14202")
