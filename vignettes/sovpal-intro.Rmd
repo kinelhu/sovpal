@@ -12,7 +12,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment  = "#>",
   fig.width  = 7,
-  fig.height = 2
+  fig.height = 3.6,
+  dpi = 110
 )
 ```
 
@@ -21,298 +22,246 @@ library(sovpal)
 has_ggplot2 <- requireNamespace("ggplot2", quietly = TRUE)
 ```
 
-## Introduction
-
-The `sovpal` package provides color palettes derived from Soviet industrial
-standards and military paint specifications. The palettes span qualitative,
-sequential, and diverging types, with full ggplot2 integration.
-
-### Design Philosophy
-
-The standards-based palettes (`gost14202`, `gost_signal`, `soviet_military`,
-`steppe`, `hazard`) carry fixed hex values traceable to specific documents —
-GOST paint card numbers, paint manufacturer references, or military paint
-standards. Modifying these values would alter the historical record.
-
-The `constructivist` palette is evocative rather than standards-derived; its
-colors are not fixed in the same sense.
-
-Palettes come in two tiers. *Archival* palettes are faithful to their source.
-*Visualization-optimized* palettes (suffixed `_lines`, `_core`, `_cvd`) select
-or reorder colors that already appear in an archival palette for distinctness,
-white-background contrast, or colorblind safety — they never introduce a new
-hex value. To slice or subset further, index the returned named vector with
-base R, e.g. `sovpal("gost14202")[c("water", "fire")]`.
-
-## Installation
-
-```{r, eval = FALSE}
-remotes::install_github("kinelhu/sovpal")
+```{r theme, include = FALSE}
+# An opinionated visual language for the showcase. theme_linedraw evokes the
+# ruled, boxed look of Soviet technical drawing (the GOST/ESKD drafting world
+# these colors come from); we lighten its grid so the COLOR carries the plot.
+if (has_ggplot2) {
+  library(ggplot2)
+  theme_sovpal <- function(base_size = 11) {
+    theme_linedraw(base_size = base_size) +
+      theme(
+        panel.grid.major = element_line(linewidth = 0.2, colour = "grey80"),
+        panel.grid.minor = element_blank(),
+        plot.title       = element_text(face = "bold"),
+        plot.subtitle    = element_text(colour = "grey30"),
+        legend.key       = element_rect(colour = NA)
+      )
+  }
+  theme_set(theme_sovpal())
+}
 ```
 
-## Available Palettes
+`sovpal` provides color palettes drawn from the Soviet industrial world — GOST
+pipeline-identification standards, military paint specifications, safety
+signage, and Constructivist graphic design. The colors are historically
+sourced, and many of them *mean something*: in GOST 14202-69, green is water,
+red is fire suppression, yellow is gas.
 
-```{r all-palettes, fig.height = 6}
+```{r hero, eval = has_ggplot2, fig.height = 4.6, echo = FALSE}
+# Hero: terrain elevation in the `steppe` camouflage ramp, with contour ruling.
+# Sequential color + technical-drawing contours = the whole package in one image.
+v <- expand.grid(row = seq_len(nrow(volcano)), col = seq_len(ncol(volcano)))
+v$elev <- as.vector(volcano)
+
+ggplot(v, aes(col, row, fill = elev)) +
+  geom_raster() +
+  geom_contour(aes(z = elev), colour = "grey15", linewidth = 0.15, bins = 12) +
+  scale_fill_sovpal("steppe", discrete = FALSE, name = "Elevation") +
+  coord_equal(expand = FALSE) +
+  labs(
+    title    = "sovpal",
+    subtitle = "steppe (7K / 4BO / 6K camouflage) over terrain elevation"
+  ) +
+  theme(axis.title = element_blank(), axis.text = element_blank(),
+        axis.ticks = element_blank())
+```
+
+## The palettes at a glance
+
+```{r gallery, fig.height = 6}
 show_all_palettes()
 ```
 
-### Individual Palettes
+Six **archival** palettes are faithful to a source document or reference; three
+**visualization-optimized** palettes (`_lines`, `_core`, `_cvd`, plus the warm
+diverging variant) reuse those exact hex values, reordered or filtered for
+contrast and colorblind safety. `sovpal_palettes()` lists them all:
 
-**`gost14202` — GOST 14202-69 Industrial Pipeline Identification**
-
-```{r pal-gost14202}
-show_palette("gost14202")
+```{r enumerate}
+sovpal_palettes()
 ```
 
-**`soviet_military` — Soviet WWII and Cold War Vehicle/Aircraft Colors**
+## Colors that mean something
 
-```{r pal-soviet-military}
-show_palette("soviet_military")
+The distinctive thing about the GOST palettes is *semantic* color: each name
+maps to a fixed meaning. Because `sovpal()` returns a **named** vector, you can
+map categories to their correct colors with `scale_*_manual()` — water is always
+green, gas always yellow, regardless of plotting order.
+
+```{r pipeline, eval = has_ggplot2, fig.height = 4}
+set.seed(1969)
+fluids <- names(sovpal("gost14202"))
+flow <- expand.grid(year = 1965:1980, fluid = fluids)
+flow$throughput <- round(abs(
+  rep(c(120, 40, 70, 55, 25, 30, 90, 45), each = 16) +
+    rep(seq(0, 30, length.out = 16), times = 8) +
+    rnorm(nrow(flow), 0, 8)
+))
+flow$fluid <- factor(flow$fluid, levels = fluids)
+
+ggplot(flow, aes(year, throughput, fill = fluid)) +
+  geom_area(colour = "grey15", linewidth = 0.15) +
+  scale_fill_manual(values = sovpal("gost14202")) +
+  labs(
+    title    = "Pipeline throughput by fluid category",
+    subtitle = "GOST 14202-69 colors mapped to their meanings (green = water, red = fire main)",
+    x = NULL, y = "Throughput", fill = "Fluid"
+  )
 ```
 
-**`constructivist` — Soviet Constructivist Graphic Design**
+## Two tiers: archival vs. visualization-optimized
 
-```{r pal-constructivist}
-show_palette("constructivist")
+Faithful palettes are not always plot-ready. In `gost14202`, the pale `gas`
+yellow has a contrast ratio of only 1.97 against white, so it washes out as thin
+lines or small points (every other stop, including the dark `fuel` brown at
+9.32, reads fine). Rather than silently dropping it, sovpal ships an explicit
+`gost14202_lines` palette — the choice is visible in your code.
+
+```{r tier-before, eval = has_ggplot2, fig.height = 3.4}
+pts <- data.frame(
+  x = rep(seq_along(fluids), each = 12) + rnorm(12 * 8, 0, 0.12),
+  y = rnorm(12 * 8),
+  fluid = factor(rep(fluids, each = 12), levels = fluids)
+)
+
+ggplot(pts, aes(x, y, colour = fluid)) +
+  geom_point(size = 2.6) +
+  scale_color_sovpal("gost14202") +
+  labs(title = "Full gost14202 (8 colors)",
+       subtitle = "gas (yellow) barely reads as points on white",
+       x = NULL, y = NULL)
 ```
 
-**`gost_signal` — GOST 12.4.026 Mandatory Safety Signal Colors**
-
-```{r pal-gost-signal}
-show_palette("gost_signal")
+```{r tier-after, eval = has_ggplot2, fig.height = 3.4}
+lines_fluids <- names(sovpal("gost14202_lines"))
+ggplot(subset(pts, fluid %in% lines_fluids), aes(x, y, colour = fluid)) +
+  geom_point(size = 2.6) +
+  scale_color_sovpal("gost14202_lines") +
+  labs(title = "gost14202_lines (7 colors)",
+       subtitle = "the same palette minus the one washed-out yellow",
+       x = NULL, y = NULL)
 ```
 
-**`steppe` — Soviet Camouflage Field Colors (Sequential)**
+## Sequential and diverging
 
-```{r pal-steppe}
-show_palette("steppe")
+`steppe` is a camouflage terrain ramp (sand → protective green → dark brown).
+Its lightness is not strictly monotonic, so it reads as terrain more than as a
+strict magnitude scale — which is exactly what the hero image uses it for.
+
+For diverging scales the midpoint should be the *lightest* point. The
+visualization-optimized diverging palettes use a light cream center; the
+prettiest is `hazard_warm` (green → cream → red):
+
+```{r diverging-warm, eval = has_ggplot2, fig.height = 4.4}
+v$centered <- v$elev - mean(v$elev)
+lim <- max(abs(v$centered))
+
+ggplot(v, aes(col, row, fill = centered)) +
+  geom_raster() +
+  scale_fill_sovpal("hazard_warm", discrete = FALSE,
+                    limits = c(-lim, lim), name = "Δ elev") +
+  coord_equal(expand = FALSE) +
+  labs(title = "hazard_warm", subtitle = "green / cream / red — light center, dark arms") +
+  theme(axis.title = element_blank(), axis.text = element_blank(),
+        axis.ticks = element_blank())
 ```
 
-**`hazard` — Safe to Danger (Diverging)**
+When red–green colorblindness matters, `hazard_cvd` (blue → cream → red) carries
+the same safe-to-danger meaning with distinguishable hues:
 
-```{r pal-hazard}
-show_palette("hazard")
+```{r diverging-cvd, eval = has_ggplot2, fig.height = 4.4}
+ggplot(v, aes(col, row, fill = centered)) +
+  geom_raster() +
+  scale_fill_sovpal("hazard_cvd", discrete = FALSE,
+                    limits = c(-lim, lim), name = "Δ elev") +
+  coord_equal(expand = FALSE) +
+  labs(title = "hazard_cvd", subtitle = "colorblind-safe alternative") +
+  theme(axis.title = element_blank(), axis.text = element_blank(),
+        axis.ticks = element_blank())
 ```
 
-### Visualization-optimized palettes
+The archival `hazard` (green / grey / red) keeps its faithful GOST values and is
+intended as the historical record rather than the default plotting choice.
 
-These reuse only canonical hex values from the archival palettes above.
+## Qualitative distributions
 
-```{r pal-viz}
-show_palette("gost14202_lines")
-show_palette("constructivist_core")
-show_palette("hazard_cvd")
-show_palette("hazard_warm")
+When the colors are just an attractive qualitative set, `soviet_military` gives
+six muted, period-correct hues:
+
+```{r densities, eval = has_ggplot2, fig.height = 3.8}
+set.seed(42)
+classes <- names(sovpal("soviet_military"))
+dens <- data.frame(
+  value = c(rnorm(200, 5), rnorm(200, 6.5), rnorm(200, 4),
+            rnorm(200, 7), rnorm(200, 5.5), rnorm(200, 8)),
+  class = factor(rep(classes, each = 200), levels = classes)
+)
+
+ggplot(dens, aes(value, fill = class)) +
+  geom_density(alpha = 0.65, colour = "grey15", linewidth = 0.2) +
+  scale_fill_sovpal("soviet_military") +
+  labs(title = "soviet_military", x = NULL, y = "Density", fill = NULL)
 ```
 
-## Basic Usage
+## Usage
 
-```{r basic-retrieval}
+```{r usage}
+# Retrieve a palette (named vector)
 sovpal("gost14202")
 
+# n colors, or interpolate a continuous ramp
 sovpal("gost14202", n = 4)
+length(sovpal("steppe", n = 100, type = "continuous"))
+
+# Slice or subset with base-R indexing — no special arguments
+sovpal("gost14202")[c("water", "fire", "air")]
 ```
 
-Interpolate a continuous ramp:
+`palette_info()` reports provenance, intended use, colorblindness caveats, and
+**computed** white-background contrast (WCAG ratio; the 3:1 line is the non-text
+threshold):
 
-```{r continuous}
-ramp <- sovpal("steppe", n = 100, type = "continuous")
-length(ramp)
-```
-
-Inspect metadata with `palette_info()`:
-
-```{r palette-info}
-palette_info("gost14202")
-```
-
-```{r hazard-info}
-info <- palette_info("hazard")
-cat(info$recommended_use, "\n")
-cat(info$cvd_note, "\n")
-```
-
-Base R usage:
-
-```{r base-r-plot, fig.height = 3.5}
-barplot(
-  1:8,
-  col       = sovpal("gost14202"),
-  main      = "GOST 14202-69 Pipeline Identification Colors",
-  names.arg = names(sovpal("gost14202")),
-  las       = 2,
-  cex.names = 0.75
-)
-```
-
-## White-Background and Colorblind-Safe Usage
-
-Rather than altering colors at runtime, sovpal ships explicit
-visualization-optimized palettes that reuse only canonical hex values. Request
-them by name.
-
-### Color scales: pick a lines palette
-
-For points and lines on white, use the `_lines` palette. The light yellow and
-dark brown stops of `gost14202` are dropped — and the choice is visible in the
-call, not hidden:
-
-```{r lines-demo, eval = has_ggplot2}
-library(ggplot2)
-
-ggplot(iris, aes(Sepal.Length, Sepal.Width, colour = Species)) +
-  geom_point(size = 2) +
-  scale_color_sovpal("gost14202_lines") +
-  theme_minimal()
-```
-
-### Fill scales
-
-`scale_fill_sovpal()` uses the named palette exactly as defined. For
-Constructivist on white, use `constructivist_core`, which omits the
-low-contrast cream ground:
-
-```{r constructivist-fill, eval = has_ggplot2, fig.height = 3.5}
-ggplot(iris, aes(Species, Sepal.Length, fill = Species)) +
-  geom_boxplot() +
-  scale_fill_sovpal("constructivist_core") +
-  theme_minimal()
-```
-
-### Checking contrast
-
-`palette_info()` reports each color's WCAG contrast ratio against white and
-flags any below the 3:1 non-text threshold:
-
-```{r contrast-check}
+```{r info}
 info <- palette_info("constructivist")
+info$source
 info$contrast_white
-info$low_contrast_on_white
+info$low_contrast_on_white   # cream and yellow fall below 3:1
 ```
 
-### Using `sovpal()` directly
+ggplot2 scales are provided for both aesthetics: `scale_color_sovpal()` /
+`scale_colour_sovpal()` and `scale_fill_sovpal()`, each with `discrete` and
+`direction` arguments. Base R works directly, since `sovpal()` returns a plain
+vector:
 
-`sovpal()` returns a plain named vector, so base-R indexing covers any custom
-selection or slice:
-
-```{r direct-subset}
-# Select colors by name
-sovpal("gost14202")[c("water", "fire", "air", "toxic", "alkali", "other")]
-
-# Or just use the ready-made lines palette
-sovpal("gost14202_lines")
+```{r base-r, fig.height = 3.2}
+barplot(rep(1, 8), col = sovpal("gost14202"), border = "grey15",
+        names.arg = names(sovpal("gost14202")), las = 2, cex.names = 0.7,
+        axes = FALSE)
 ```
 
-## ggplot2 Integration
+## Historical notes
 
-```{r ggplot2-bar, eval = has_ggplot2, fig.height = 3.5}
-library(ggplot2)
+**GOST 14202-69 — pipeline identification.** Adopted in 1969, it standardized
+the color-coding of industrial pipelines across all Soviet enterprises: eight
+base colors for fluid categories, referenced by paint card number. The system
+remains in use in post-Soviet facilities under inherited technical regulations.
 
-df_fluid <- data.frame(
-  fluid = factor(names(sovpal("gost14202")), levels = names(sovpal("gost14202"))),
-  flow  = c(120, 95, 60, 80, 45, 70, 110, 55)
-)
+**GOST 12.4.026 — safety signage.** Four signal colors encoding hierarchical
+urgency: red (danger, prohibition), yellow (caution), green (safe, evacuation),
+blue (mandatory action, PPE).
 
-ggplot(df_fluid, aes(fluid, flow, fill = fluid)) +
-  geom_col() +
-  scale_fill_sovpal("gost14202") +
-  labs(title = "GOST 14202-69: Pipeline Colors", x = NULL, y = "Flow rate (L/min)") +
-  theme_minimal() +
-  theme(legend.position = "none", axis.text.x = element_text(angle = 30, hjust = 1))
+**4BO Protective Green (`#51653F`).** The canonical Soviet vehicle exterior
+color, adopted in the 1930s and used through WWII and the Cold War. Based on
+Vallejo 70.609 and corroborated by AK Interactive measurements of surviving
+vehicles. It appears in `soviet_military` and as `steppe`'s middle stop.
+
+**Cockpit turquoise (`#5B8F8C`).** The grey-turquoise of Soviet aircraft
+interiors from the 1940s–1970s (MiG-15 through Su-27), derived from AK Real
+Colors RC206.
+
+**Constructivism.** The 1920s–30s poster language of red, black, and white with
+yellow and blue accents. `constructivist` is *evocative* of this corpus, not
+standards-derived; its cream (`#E8DFC8`) recalls the aged paper ground and is
+low-contrast on white — hence `constructivist_core`.
 ```
-
-```{r ggplot2-scatter, eval = has_ggplot2, fig.height = 3.5}
-ggplot(iris, aes(Sepal.Length, Sepal.Width, colour = Species)) +
-  geom_point(size = 2.5) +
-  scale_color_sovpal("soviet_military") +
-  labs(title = "soviet_military") +
-  theme_minimal()
-```
-
-```{r ggplot2-heatmap, eval = has_ggplot2, fig.height = 3.5}
-# Hazard diverging palette -- risk scores, hazard ratios, survival data
-m <- outer(1:10, 1:10, function(x, y) (x - 5.5) * (y - 5.5))
-df_hm <- data.frame(
-  x = rep(1:10, 10),
-  y = rep(1:10, each = 10),
-  z = as.vector(m)
-)
-ggplot(df_hm, aes(x, y, fill = z)) +
-  geom_tile() +
-  scale_fill_sovpal("hazard", discrete = FALSE) +
-  labs(title = "Hazard Palette -- Diverging Risk Heatmap", fill = "Score") +
-  theme_minimal() +
-  coord_equal()
-```
-
-The diverging palettes use a light cream midpoint that reads as a zero-point and
-makes both arms pop. `hazard` itself keeps its archival GOST green/grey/red. For
-plots, `hazard_warm` (green/cream/red) is the most legible, and `hazard_cvd`
-(blue/cream/red) carries the same safe-to-danger semantics with colorblind-safe
-hues for red-green-deficient audiences:
-
-```{r ggplot2-heatmap-cvd, eval = has_ggplot2, fig.height = 3.5}
-ggplot(df_hm, aes(x, y, fill = z)) +
-  geom_tile() +
-  scale_fill_sovpal("hazard_cvd", discrete = FALSE) +
-  labs(title = "hazard_cvd -- Colorblind-Safe Diverging", fill = "Score") +
-  theme_minimal() +
-  coord_equal()
-```
-
-```{r ggplot2-sequential, eval = has_ggplot2, fig.height = 3.5}
-# Steppe sequential gradient
-df_seq <- data.frame(x = factor(1:8), y = c(3, 7, 2, 9, 5, 6, 4, 8))
-ggplot(df_seq, aes(x, y, fill = y)) +
-  geom_col() +
-  scale_fill_sovpal("steppe", discrete = FALSE) +
-  labs(title = "Steppe Sequential Palette") +
-  theme_minimal() +
-  theme(legend.position = "none")
-```
-
-## Historical Notes
-
-### GOST 14202-69 — Pipeline Identification
-
-GOST 14202-69 (*Truboprovody promyshlennykh predpriyatiy. Opoznavatelnaya
-okraska, preduprezhdayushchie znaki i markirovochnye shchitki*) was adopted in
-1969 and standardized the color-coding of industrial pipelines across all
-Soviet enterprises. The standard specified eight base colors corresponding to
-fluid categories, referenced by paint card number. The `gost14202` hex values
-correspond to those card-indexed samples. The system remains mandatory in
-post-Soviet industrial facilities operating under inherited Soviet technical
-regulations.
-
-### GOST 12.4.026 — Safety Signage
-
-GOST 12.4.026 standardized workplace safety signage colors across the Soviet
-Union. The four signal colors encode hierarchical urgency: red (immediate
-danger, prohibition), yellow (caution, warning zones), green (safe conditions,
-evacuation routes), and blue (mandatory action, PPE requirements). Post-Soviet
-revisions preserved all four signal colors with minimal change.
-
-### 4BO Protective Green
-
-4BO (*Zashchitnyy*) is the canonical Soviet military vehicle exterior color,
-adopted in the 1930s and used continuously through WWII and the Cold War. The
-hex value #51653F is based on Vallejo Model Color 70.609 and corroborated by AK
-Interactive spectrographic measurements of surviving vehicle examples. It
-appears in `soviet_military` (`green_4bo`) and `steppe` (stop 2).
-
-### Cockpit Turquoise
-
-Soviet aircraft cockpits from the 1940s through the 1970s were finished in a
-distinctive grey-turquoise used across diverse airframes including the MiG-15,
-MiG-21, Tu-95, and Su-27. The value #5B8F8C is derived from AK Real Colors
-RC206 (*Interior Turquoise Green*), formulated from spectrographic analysis of
-preserved cockpit interiors.
-
-### Constructivist Poster Design
-
-Soviet Constructivism (1920s--1930s) developed a visual language centered on
-a small set of high-contrast colors: red, black, and white, with yellow and
-blue as secondary elements. The `constructivist` palette is evocative of this
-corpus rather than derived from a specific technical standard. The cream
-(#E8DFC8) reflects the typical ground color of printed poster reproductions
-and is low-contrast on white backgrounds.

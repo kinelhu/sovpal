@@ -43,9 +43,12 @@ test_that("named vectors support base-R subsetting (replacing the subset arg)", 
 # --- visualization-optimized tier --------------------------------------------
 
 test_that("viz palettes exist and reuse only canonical hex values", {
-  # gost14202_lines is a strict subset of gost14202
+  # gost14202_lines is a strict subset of gost14202 that drops only the
+  # low-contrast gas yellow (keeps the dark, high-contrast fuel brown)
   expect_true(all(sovpal("gost14202_lines") %in% sovpal("gost14202")))
-  expect_length(sovpal("gost14202_lines"), 6)
+  expect_length(sovpal("gost14202_lines"), 7)
+  expect_false("#F9A825" %in% sovpal("gost14202_lines"))  # gas dropped
+  expect_true("#5D4037" %in% sovpal("gost14202_lines"))   # fuel kept
 
   # constructivist_core drops cream only
   expect_true(all(sovpal("constructivist_core") %in% sovpal("constructivist")))
@@ -154,7 +157,7 @@ test_that("scale_color_sovpal uses the full named palette (no auto-subset)", {
 test_that("scale_color_sovpal honors an explicit lines palette", {
   skip_if_not_installed("ggplot2")
   sc <- scale_color_sovpal("gost14202_lines")
-  expect_equal(sc$palette(6), unname(sovpal("gost14202_lines")))
+  expect_equal(sc$palette(7), unname(sovpal("gost14202_lines")))
 })
 
 test_that("scale_fill_sovpal uses the full palette by default", {

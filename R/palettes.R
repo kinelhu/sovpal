@@ -86,8 +86,11 @@
 
   # --- Qualitative (viz-optimized) -------------------------------------------
 
-  # Lines-safe subset of gost14202: drops gas (#F9A825 yellow) and fuel
-  # (#5D4037 brown). Both hex values are exactly as defined in gost14202.
+  # Lines-safe subset of gost14202: drops only gas (#F9A825), the one stop
+  # below the WCAG 3:1 contrast-on-white threshold (1.97) and thus hard to read
+  # as thin lines or small points on white. Every other stop -- including the
+  # dark fuel brown (contrast 9.32) -- reads fine on white and is retained. All
+  # hex values are exactly as defined in gost14202.
   gost14202_lines = structure(
     c(
       water  = "#2E7D32",
@@ -95,6 +98,7 @@
       air    = "#5B8DB8",
       toxic  = "#E64A19",
       alkali = "#8E6EAF",
+      fuel   = "#5D4037",
       other  = "#78909C"
     ),
     type = "qualitative"
@@ -159,9 +163,9 @@
     cvd_note        = NULL,
     derived_from    = NULL,
     white_note      = paste0(
-      "8 colors at the upper edge of qualitative distinctness. For points and ",
-      "lines on a white background, use the `gost14202_lines` palette (drops ",
-      "the light yellow `gas` and dark `fuel` stops)."
+      "8 colors at the upper edge of qualitative distinctness. Only the light ",
+      "`gas` yellow is below the 3:1 contrast threshold on white; for thin ",
+      "lines or small points use the `gost14202_lines` palette, which drops it."
     )
   ),
   soviet_military = list(
@@ -227,7 +231,7 @@
     tier            = "viz",
     evocative       = FALSE,
     source          = "Subset of gost14202 (GOST 14202-69); no hex values altered.",
-    recommended_use = "Lines/points on white backgrounds. Six maximally distinct gost14202 stops.",
+    recommended_use = "Lines/points on white backgrounds. gost14202 with only the low-contrast `gas` yellow removed.",
     cvd_note        = NULL,
     derived_from    = "gost14202",
     white_note      = "All stops are adequate for points and lines on white."

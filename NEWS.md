@@ -18,7 +18,8 @@ is still lifecycle-experimental and pre-CRAN).
 ## New features
 
 * **Visualization-optimized palettes** that reuse only canonical hex values:
-  * `gost14202_lines` — white-background-safe 6-color subset of `gost14202`.
+  * `gost14202_lines` — `gost14202` with only the low-contrast `gas` yellow
+    removed, for thin lines and small points on white (7 colors).
   * `constructivist_core` — `constructivist` without the low-contrast cream.
   * `hazard_cvd` — colorblind-safe (blue/cream/red) alternative to `hazard`.
   * `hazard_warm` — green/cream/red diverging scale; the most legible

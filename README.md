@@ -79,7 +79,7 @@ vector: `sovpal("gost14202")[c("water", "fire")]` or `sovpal("steppe")[2:3]`.
 | `gost_signal` | qualitative | 4 | archival | Mandatory workplace safety signal colors | GOST 12.4.026 |
 | `steppe` | sequential | 3 | archival | Soviet camouflage field terrain colors | 7K / 4BO / 6K paint standards |
 | `hazard` | diverging | 3 | archival | Safe → danger (green/grey/red) | GOST 14202-69 |
-| `gost14202_lines` | qualitative | 6 | viz | White-safe subset of `gost14202` | subset of GOST 14202-69 |
+| `gost14202_lines` | qualitative | 7 | viz | `gost14202` minus the low-contrast `gas` yellow (lines/points on white) | subset of GOST 14202-69 |
 | `constructivist_core` | qualitative | 4 | viz | `constructivist` without the cream ground | subset of `constructivist` |
 | `hazard_cvd` | diverging | 3 | viz | Colorblind-safe safe → danger (blue/cream/red) | canonical sovpal hexes |
 | `hazard_warm` | diverging | 3 | viz | Safe → danger (green/cream/red); prettiest, **not** CVD-safe | canonical sovpal hexes |
@@ -109,7 +109,7 @@ constructivist:      #CD2500  #1A1A1A  #F9A825  #E8DFC8  #1565C0
 gost_signal:         #D32F2F  #FDD835  #388E3C  #1565C0
 steppe:              #C9A96E  #51653F  #3D2B1F
 hazard:              #2E7D32  #78909C  #C62828
-gost14202_lines:     #2E7D32  #C62828  #5B8DB8  #E64A19  #8E6EAF  #78909C
+gost14202_lines:     #2E7D32  #C62828  #5B8DB8  #E64A19  #8E6EAF  #5D4037  #78909C
 constructivist_core: #CD2500  #1A1A1A  #F9A825  #1565C0
 hazard_cvd:          #1565C0  #E8DFC8  #C62828
 hazard_warm:         #2E7D32  #E8DFC8  #C62828
