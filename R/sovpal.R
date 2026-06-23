@@ -147,7 +147,7 @@ sovpal_palettes <- function() {
 #' @return Invisibly returns `NULL`. Called for its side effects.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' show_palette("gost14202")
 #' show_palette("hazard")
 #' show_palette("hazard_cvd")
@@ -208,7 +208,7 @@ show_palette <- function(name, notes = TRUE) {
 #' @return Invisibly returns `NULL`. Called for its side effects.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' show_all_palettes()
 #' show_all_palettes(type = "qualitative")
 #' show_all_palettes(domain = "artistic")

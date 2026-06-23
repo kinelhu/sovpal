@@ -21,7 +21,7 @@ base R graphics. When \code{notes = TRUE}, any white-background, recommended-use
 or colorblindness notes for the palette are printed to the console.
 }
 \examples{
-\dontrun{
+\donttest{
 show_palette("gost14202")
 show_palette("hazard")
 show_palette("hazard_cvd")

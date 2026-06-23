@@ -21,7 +21,7 @@ Renders palettes stacked vertically using base R graphics, one row per
 palette labeled with its name and type. Filter by color type and/or domain.
 }
 \examples{
-\dontrun{
+\donttest{
 show_all_palettes()
 show_all_palettes(type = "qualitative")
 show_all_palettes(domain = "artistic")

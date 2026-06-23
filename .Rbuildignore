@@ -8,3 +8,7 @@
 ^sovpal_package_spec\.md$
 ^data-raw$
 ^PALETTEER\.md$
+^cran-comments\.md$
+^\.gitignore$
+^\.DS_Store$
+\.DS_Store$
