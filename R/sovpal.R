@@ -162,9 +162,20 @@ show_palette <- function(name, notes = TRUE) {
   cols  <- as.character(pal)
   nms   <- if (!is.null(names(pal))) names(pal) else paste0("stop", seq_along(cols))
   n     <- length(cols)
+  labels <- paste0(nms, " ", cols)
 
-  op <- graphics::par(mar = c(5.5, 0.5, 2, 0.5), no.readonly = TRUE)
+  op <- graphics::par(no.readonly = TRUE)
   on.exit(graphics::par(op))
+
+  # Size the bottom margin to the longest vertical label so it is not clipped.
+  # strwidth/csi give the label length in margin lines. Clamp to the device
+  # height so a short figure does not raise a "margins too large" error.
+  csi      <- graphics::par("csi")
+  lab_lines <- max(graphics::strwidth(labels, units = "inches", cex = 0.6)) /
+    csi + 1.5
+  max_lines <- (graphics::par("din")[2] - 0.9) / csi - 2  # reserve top + swatch
+  bottom    <- min(max(5.5, lab_lines), max(2, max_lines))
+  graphics::par(mar = c(bottom, 0.5, 2, 0.5))
 
   graphics::image(
     seq_len(n), 1, matrix(seq_len(n), ncol = 1),
@@ -176,7 +187,7 @@ show_palette <- function(name, notes = TRUE) {
   graphics::axis(
     side     = 1,
     at       = seq_len(n),
-    labels   = paste0(nms, " ", cols),
+    labels   = labels,
     tick     = FALSE,
     cex.axis = 0.6,
     las      = 2
@@ -235,13 +246,20 @@ show_all_palettes <- function(type = NULL, domain = NULL) {
   n_pals    <- length(pals)
   pal_names <- names(pals)
 
-  op <- graphics::par(
-    mfrow = c(n_pals, 1),
-    mar   = c(0.3, 9, 0.3, 0.5),
-    oma   = c(0, 0, 2, 0),
-    no.readonly = TRUE
-  )
+  op <- graphics::par(no.readonly = TRUE)
   on.exit(graphics::par(op))
+
+  row_labels <- vapply(pal_names,
+    function(nm) sprintf("%s  [%s]", nm, attr(pals[[nm]], "type")),
+    character(1))
+
+  # Size the left margin to the longest "name [type]" label so it is not
+  # clipped. mfrow is set first so strwidth/csi reflect the shrunk per-panel
+  # text size; the factor of 2 leaves headroom for label placement.
+  graphics::par(mfrow = c(n_pals, 1), oma = c(0, 0, 2, 0))
+  lab_lines <- 2 * max(graphics::strwidth(row_labels, units = "inches", cex = 0.7)) /
+    graphics::par("csi") + 1
+  graphics::par(mar = c(0.3, max(6, lab_lines), 0.3, 0.5))
 
   for (nm in pal_names) {
     pal   <- pals[[nm]]
@@ -256,7 +274,7 @@ show_all_palettes <- function(type = NULL, domain = NULL) {
     )
     graphics::mtext(
       sprintf("%s  [%s]", nm, ptype),
-      side = 2, las = 1, line = 0.5, cex = 0.7
+      side = 2, las = 1, line = 0.5, adj = 1, cex = 0.7
     )
   }
   graphics::mtext("sovpal palettes", outer = TRUE, cex = 1, line = 0.5)

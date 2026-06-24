@@ -49,15 +49,17 @@ lum <- function(hex) {
 art_plot <- function(img_path, pal_name, caption) {
   im   <- jpeg::readJPEG(img_path)
   cols <- sovpal(pal_name); n <- length(cols)
+  op <- par(no.readonly = TRUE); on.exit(par(op))
   layout(matrix(1:2, nrow = 1), widths = c(1, 1.25))
-  par(mar = c(0.4, 0.4, 2, 0.4))
+  # Reserve an outer top margin so the caption spans the full device width
+  # instead of clipping over the narrow image panel.
+  par(oma = c(0, 0, 2.2, 0), mar = c(0.4, 0.4, 0.4, 0.4))
   plot.new(); plot.window(c(0, 1), c(0, 1)); rasterImage(im, 0, 0, 1, 1)
-  title(caption, font.main = 2, cex.main = 1)
-  par(mar = c(0.4, 0.4, 2, 0.4))
   plot.new(); plot.window(c(0, n), c(0, 1))
   rect(0:(n - 1), 0, 1:n, 1, col = cols, border = "grey25", lwd = 1.5)
   text((0:(n - 1)) + 0.5, 0.5, names(cols), srt = 90, cex = 0.8,
        col = ifelse(lum(cols) > 0.5, "grey10", "white"))
+  mtext(caption, outer = TRUE, font = 2, cex = 0.95, line = 0.4)
 }
 ```
 
@@ -167,7 +169,7 @@ copyright in the EU (Stepanova died in 1958), so the image is not bundled; the
 palette is shown below.
 [View the work at the Museo Thyssen-Bornemisza](https://www.museothyssen.org/en/collection/artists/stepanova-varvara/billiard-players).
 
-```{r art-stepanova, fig.height = 1.7}
+```{r art-stepanova, fig.height = 2.6}
 show_palette("stepanova", notes = FALSE)
 ```
 
